@@ -27,3 +27,4 @@ require (
 	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d // indirect
 	golang.org/x/text v0.3.7 // indirect
 )
+replace github.com/bhbosman/goUi => ../goUi

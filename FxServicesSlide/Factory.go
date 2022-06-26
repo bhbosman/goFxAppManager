@@ -38,13 +38,13 @@ func (self *Factory) Title() string {
 
 func (self *Factory) Content() ui.SlideCallback {
 	return func(
-		nextSlide func()) (string, ui.IPrimitiveCloser) {
-		return self.Title(),
-			NewFxServiceSlide(
-				self.applicationContext,
-				self.pubSub, self.app,
-				self.fxManagerService,
-			)
-
+		nextSlide func(),
+	) (string, ui.IPrimitiveCloser, error) {
+		slide := NewFxServiceSlide(
+			self.applicationContext,
+			self.pubSub, self.app,
+			self.fxManagerService,
+		)
+		return self.Title(), slide, nil
 	}
 }

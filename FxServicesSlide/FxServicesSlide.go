@@ -24,6 +24,10 @@ type FxServicesManagerSlide struct {
 	plate      *FxAppManagerPlateContent
 }
 
+func (self *FxServicesManagerSlide) UpdateContent() error {
+	return nil
+}
+
 func (self *FxServicesManagerSlide) Close() error {
 	self.cancelFunc()
 	close(self.channel)
