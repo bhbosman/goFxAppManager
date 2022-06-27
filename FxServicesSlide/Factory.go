@@ -2,6 +2,7 @@ package FxServicesSlide
 
 import (
 	"context"
+	"github.com/bhbosman/goFxAppManager/FxServicesSlide/internal"
 	"github.com/bhbosman/goFxAppManager/Serivce"
 	"github.com/bhbosman/goUi/ui"
 	"github.com/cskr/pubsub"
@@ -13,6 +14,8 @@ type Factory struct {
 	applicationContext context.Context
 	pubSub             *pubsub.PubSub
 	app                *tview.Application
+	//onData             func() (internal.IFxManagerData, error)
+	service internal.IFxManagerService
 }
 
 func (self *Factory) OrderNumber() int {
@@ -23,12 +26,17 @@ func NewFactory(
 	applicationContext context.Context,
 	pubSub *pubsub.PubSub,
 	app *tview.Application,
-	fxManagerService Serivce.IFxManagerService) (*Factory, error) {
+	fxManagerService Serivce.IFxManagerService,
+	//onData func() (internal.IFxManagerData, error),
+	service internal.IFxManagerService,
+) (*Factory, error) {
 	return &Factory{
 		fxManagerService:   fxManagerService,
 		applicationContext: applicationContext,
 		pubSub:             pubSub,
 		app:                app,
+		//onData:             onData,
+		service: service,
 	}, nil
 }
 
@@ -41,9 +49,8 @@ func (self *Factory) Content() ui.SlideCallback {
 		nextSlide func(),
 	) (string, ui.IPrimitiveCloser, error) {
 		slide := NewFxServiceSlide(
-			self.applicationContext,
-			self.pubSub, self.app,
-			self.fxManagerService,
+			self.service,
+			self.app,
 		)
 		return self.Title(), slide, nil
 	}

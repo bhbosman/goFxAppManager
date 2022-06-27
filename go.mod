@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/bhbosman/goUi v0.0.0-20220625174028-03193a90ee79
-	github.com/bhbosman/gocommon v0.0.0-20220625172843-54633d70219d
+	github.com/bhbosman/gocommon v0.0.0-20220627073905-4951fb81c325
 	github.com/cskr/pubsub v1.0.2
 	github.com/gdamore/tcell/v2 v2.5.1
 	github.com/golang/mock v1.6.0
@@ -27,4 +27,9 @@ require (
 	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d // indirect
 	golang.org/x/text v0.3.7 // indirect
 )
+
 replace github.com/bhbosman/goUi => ../goUi
+
+replace github.com/bhbosman/goConnectionManager => ../goConnectionManager
+
+replace github.com/golang/mock => github.com/bhbosman/gomock v1.6.1-0.20220617134815-f277ff266f47

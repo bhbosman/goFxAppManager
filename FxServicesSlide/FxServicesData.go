@@ -2,6 +2,7 @@ package FxServicesSlide
 
 import (
 	"context"
+	"github.com/bhbosman/goFxAppManager/FxServicesSlide/internal"
 	"github.com/bhbosman/goFxAppManager/Serivce"
 	"github.com/bhbosman/goFxAppManager/Serivce/model"
 	"github.com/bhbosman/gocommon/messageRouter"
@@ -13,9 +14,13 @@ type fxServiceManagerSlideData struct {
 	serviceListIsDirty         bool
 	ss                         map[string]*FxServicesManagerData
 	messageRouter              *messageRouter.MessageRouter
-	onConnectionListChange     func(connectionList []IdAndName)
-	onConnectionInstanceChange func(data SendActionsForService)
+	onConnectionListChange     func(connectionList []internal.IdAndName)
+	onConnectionInstanceChange func(data internal.SendActionsForService)
 	fxManagerService           Serivce.IFxManagerService
+}
+
+func (self *fxServiceManagerSlideData) ShutDown() error {
+	return nil
 }
 
 func (self *fxServiceManagerSlideData) StartAllService() {
@@ -34,24 +39,6 @@ func (self *fxServiceManagerSlideData) StopService(name string) {
 	_ = self.fxManagerService.Stop(context.Background(), name)
 }
 
-func NewData(
-	fxManagerService Serivce.IFxManagerService,
-) *fxServiceManagerSlideData {
-	result := &fxServiceManagerSlideData{
-		ss:               make(map[string]*FxServicesManagerData),
-		messageRouter:    messageRouter.NewMessageRouter(),
-		fxManagerService: fxManagerService,
-	}
-	_ = result.messageRouter.Add(result.handleEmptyQueue)
-	_ = result.messageRouter.Add(result.handleFxServiceStarted)
-	_ = result.messageRouter.Add(result.handleFxServiceStopped)
-	_ = result.messageRouter.Add(result.handleFxServiceAdded)
-	_ = result.messageRouter.Add(result.handleFxServiceStatus)
-	_ = result.messageRouter.Add(result.handlePublishInstanceDataFor)
-
-	return result
-}
-
 func (self *fxServiceManagerSlideData) Send(data interface{}) error {
 	_, err := self.messageRouter.Route(data)
 	return err
@@ -63,6 +50,7 @@ func (self *fxServiceManagerSlideData) handlePublishInstanceDataFor(message *Pub
 	}
 	return nil
 }
+
 func (self *fxServiceManagerSlideData) handleEmptyQueue(_ *messages.EmptyQueue) error {
 	if self.serviceListIsDirty {
 		self.DoServiceListChange()
@@ -85,11 +73,11 @@ func (self *fxServiceManagerSlideData) DoServiceListChange() {
 			ss = append(ss, key)
 		}
 		sort.Strings(ss)
-		cbData := make([]IdAndName, 0, len(self.ss))
+		cbData := make([]internal.IdAndName, 0, len(self.ss))
 
 		for _, s := range ss {
 			if info, ok := self.ss[s]; ok {
-				idAndName := IdAndName{
+				idAndName := internal.IdAndName{
 					ServiceId:         info.ServiceId,
 					ServiceDependency: info.ServiceDependency,
 					Name:              info.Name,
@@ -116,7 +104,7 @@ func (self *fxServiceManagerSlideData) DoServiceInstanceChange(data *FxServicesM
 			actions = append(actions, StartServiceString)
 		}
 		actions = append(actions, []string{"-", StartAllServiceString, StopAllServiceString}...)
-		SendActionsForService := &SendActionsForService{
+		SendActionsForService := &internal.SendActionsForService{
 			Name:    data.Name,
 			Actions: actions,
 		}
@@ -125,11 +113,11 @@ func (self *fxServiceManagerSlideData) DoServiceInstanceChange(data *FxServicesM
 	}
 }
 
-func (self *fxServiceManagerSlideData) SetConnectionInstanceChange(cb func(data SendActionsForService)) {
+func (self *fxServiceManagerSlideData) SetConnectionInstanceChange(cb func(data internal.SendActionsForService)) {
 	self.onConnectionInstanceChange = cb
 }
 
-func (self *fxServiceManagerSlideData) SetConnectionListChange(cb func(connectionList []IdAndName)) {
+func (self *fxServiceManagerSlideData) SetConnectionListChange(cb func(connectionList []internal.IdAndName)) {
 	self.onConnectionListChange = cb
 }
 
@@ -170,4 +158,22 @@ func (self *fxServiceManagerSlideData) handleFxServiceAdded(message *model.FxSer
 	self.serviceListIsDirty = true
 
 	return nil
+}
+
+func NewData(
+	fxManagerService Serivce.IFxManagerService,
+) (*fxServiceManagerSlideData, error) {
+	result := &fxServiceManagerSlideData{
+		ss:               make(map[string]*FxServicesManagerData),
+		messageRouter:    messageRouter.NewMessageRouter(),
+		fxManagerService: fxManagerService,
+	}
+	_ = result.messageRouter.Add(result.handleEmptyQueue)
+	_ = result.messageRouter.Add(result.handleFxServiceStarted)
+	_ = result.messageRouter.Add(result.handleFxServiceStopped)
+	_ = result.messageRouter.Add(result.handleFxServiceAdded)
+	_ = result.messageRouter.Add(result.handleFxServiceStatus)
+	_ = result.messageRouter.Add(result.handlePublishInstanceDataFor)
+
+	return result, nil
 }

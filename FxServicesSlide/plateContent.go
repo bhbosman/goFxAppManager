@@ -2,20 +2,21 @@ package FxServicesSlide
 
 import (
 	"fmt"
+	"github.com/bhbosman/goFxAppManager/FxServicesSlide/internal"
 	"github.com/rivo/tview"
 )
 
-type FxAppManagerPlateContent struct {
-	Grid []IdAndName
+type PlateContent struct {
+	Grid []internal.IdAndName
 }
 
-func newFxAppManagerPlateContent(list []IdAndName) *FxAppManagerPlateContent {
-	return &FxAppManagerPlateContent{
+func newFxAppManagerPlateContent(list []internal.IdAndName) *PlateContent {
+	return &PlateContent{
 		Grid: list,
 	}
 }
 
-func (self *FxAppManagerPlateContent) GetCell(row, column int) *tview.TableCell {
+func (self *PlateContent) GetCell(row, column int) *tview.TableCell {
 	switch column {
 	case 0:
 		switch row {
@@ -70,28 +71,28 @@ func (self *FxAppManagerPlateContent) GetCell(row, column int) *tview.TableCell 
 	return tview.NewTableCell("")
 }
 
-func (self *FxAppManagerPlateContent) GetRowCount() int {
+func (self *PlateContent) GetRowCount() int {
 	return len(self.Grid) + 1
 }
 
-func (self *FxAppManagerPlateContent) GetColumnCount() int {
+func (self *PlateContent) GetColumnCount() int {
 	return 5
 }
 
-func (self *FxAppManagerPlateContent) SetCell(_, _ int, _ *tview.TableCell) {
+func (self *PlateContent) SetCell(_, _ int, _ *tview.TableCell) {
 }
 
-func (self *FxAppManagerPlateContent) RemoveRow(_ int) {
+func (self *PlateContent) RemoveRow(_ int) {
 }
 
-func (self *FxAppManagerPlateContent) RemoveColumn(_ int) {
+func (self *PlateContent) RemoveColumn(_ int) {
 }
 
-func (self *FxAppManagerPlateContent) InsertRow(_ int) {
+func (self *PlateContent) InsertRow(_ int) {
 }
 
-func (self *FxAppManagerPlateContent) InsertColumn(_ int) {
+func (self *PlateContent) InsertColumn(_ int) {
 }
 
-func (self *FxAppManagerPlateContent) Clear() {
+func (self *PlateContent) Clear() {
 }

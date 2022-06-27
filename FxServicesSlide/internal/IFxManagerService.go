@@ -1,12 +1,12 @@
 package internal
 
 import (
-	"github.com/bhbosman/gocommon/Services/IDataShutDown"
+	"github.com/bhbosman/gocommon/Services/IFxService"
 	"github.com/bhbosman/gocommon/Services/ISendMessage"
 )
 
-type IFxManagerData interface {
+type IFxManagerService interface {
 	IFxManagerSlide
 	ISendMessage.ISendMessage
-	IDataShutDown.IDataShutDown
+	IFxService.IFxServices
 }
