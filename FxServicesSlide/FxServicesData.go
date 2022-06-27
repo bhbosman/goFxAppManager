@@ -14,7 +14,7 @@ type fxServiceManagerSlideData struct {
 	ss                         map[string]*FxServicesManagerData
 	messageRouter              *messageRouter.MessageRouter
 	onConnectionListChange     func(connectionList []IdAndName)
-	onConnectionInstanceChange func(data *SendActionsForService)
+	onConnectionInstanceChange func(data SendActionsForService)
 	fxManagerService           Serivce.IFxManagerService
 }
 
@@ -116,15 +116,16 @@ func (self *fxServiceManagerSlideData) DoServiceInstanceChange(data *FxServicesM
 			actions = append(actions, StartServiceString)
 		}
 		actions = append(actions, []string{"-", StartAllServiceString, StopAllServiceString}...)
-		endActionsForService := &SendActionsForService{
+		SendActionsForService := &SendActionsForService{
 			Name:    data.Name,
 			Actions: actions,
 		}
-		self.onConnectionInstanceChange(endActionsForService)
+		dd := *SendActionsForService
+		self.onConnectionInstanceChange(dd)
 	}
 }
 
-func (self *fxServiceManagerSlideData) SetConnectionInstanceChange(cb func(data *SendActionsForService)) {
+func (self *fxServiceManagerSlideData) SetConnectionInstanceChange(cb func(data SendActionsForService)) {
 	self.onConnectionInstanceChange = cb
 }
 

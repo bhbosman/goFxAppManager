@@ -158,7 +158,7 @@ func (self *FxServicesManagerSlide) SetFxServiceListChange(list []IdAndName) {
 	})
 }
 
-func (self *FxServicesManagerSlide) SetFxServiceInstanceChange(data *SendActionsForService) {
+func (self *FxServicesManagerSlide) SetFxServiceInstanceChange(data SendActionsForService) {
 	self.app.QueueUpdateDraw(func() {
 		self.actionList.Clear()
 		self.actionList.AddItem("..", "", 0, func() {
