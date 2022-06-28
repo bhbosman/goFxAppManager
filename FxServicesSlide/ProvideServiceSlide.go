@@ -67,18 +67,12 @@ func ProvideServiceSlide() fx.Option {
 				Target: func(
 					params struct {
 						fx.In
-						App                *tview.Application
-						ApplicationContext context.Context `name:"Application"`
-						PubSub             *pubsub.PubSub  `name:"Application"`
-						FxManagerService   Serivce.IFxManagerService
-						Service            internal.IFxManagerService
+						App     *tview.Application
+						Service internal.IFxManagerService
 					},
 				) (ui.ISlideFactory, error) {
 					return NewFactory(
-						params.ApplicationContext,
-						params.PubSub,
 						params.App,
-						params.FxManagerService,
 						params.Service,
 					)
 				},
