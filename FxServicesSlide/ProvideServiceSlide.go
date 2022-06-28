@@ -17,10 +17,7 @@ func ProvideServiceSlide() fx.Option {
 				Target: func(
 					params struct {
 						fx.In
-						App                *tview.Application
-						ApplicationContext context.Context `name:"Application"`
-						PubSub             *pubsub.PubSub  `name:"Application"`
-						FxManagerService   Serivce.IFxManagerService
+						FxManagerService Serivce.IFxManagerService
 					},
 				) (func() (internal.IFxManagerData, error), error) {
 					return func() (internal.IFxManagerData, error) {
