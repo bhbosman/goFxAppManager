@@ -1,7 +1,5 @@
 github.com/benbjohnson/clock v1.1.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
 github.com/benbjohnson/clock v1.3.0 h1:ip6w0uFQkncKQ979AypyG0ER7mqUSBdKLOgAle/AT8A=
-github.com/bhbosman/gocommon v0.0.0-20220627073905-4951fb81c325 h1:MtsNdej1eH/J4bqFDa5PXtmfAwErtHy8hqakRztGhWM=
-github.com/bhbosman/gocommon v0.0.0-20220627073905-4951fb81c325/go.mod h1:QYGbRI+lmmcULgp5HLAJRZvvSYB/64NMio/WqqAdSqI=
 github.com/bhbosman/goerrors v0.0.0-20220623084908-4d7bbcd178cf h1:uI7bP2Ue0pjjB8j2zWY+nRbjQgeTfmOW6VR7WvVGK1I=
 github.com/bhbosman/goerrors v0.0.0-20220623084908-4d7bbcd178cf/go.mod h1:2aeMPIIYjD7+5AmN1yaV/oAqCaExRDcl7SN+/zFLpew=
 github.com/bhbosman/gomock v1.6.1-0.20220617134815-f277ff266f47 h1:jO7xY8pZUUiV7zzWTZLQRjIpHUPelzp/i2I2aCuk5yk=

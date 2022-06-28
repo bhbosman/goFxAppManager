@@ -30,6 +30,8 @@ require (
 
 replace github.com/bhbosman/goUi => ../goUi
 
+replace github.com/golang/mock => github.com/bhbosman/gomock v1.6.1-0.20220617134815-f277ff266f47
+
 replace github.com/bhbosman/goConnectionManager => ../goConnectionManager
 
-replace github.com/golang/mock => github.com/bhbosman/gomock v1.6.1-0.20220617134815-f277ff266f47
+replace github.com/bhbosman/gocommon => ../gocommon

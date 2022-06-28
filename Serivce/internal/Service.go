@@ -127,7 +127,6 @@ func (self *Service) goStart(data IFxManagerData) {
 		self.context,
 		data, []ChannelHandler.ChannelHandler{
 			{
-				PubSubHandler:  false,
 				BreakOnSuccess: false,
 				Cb: func(next interface{}, message interface{}) (bool, error) {
 					if unk, ok := next.(IFxManager); ok {
@@ -137,7 +136,6 @@ func (self *Service) goStart(data IFxManagerData) {
 				},
 			},
 			{
-				PubSubHandler:  false,
 				BreakOnSuccess: false,
 				Cb: func(next interface{}, message interface{}) (bool, error) {
 					if unk, ok := next.(ISendMessage.ISendMessage); ok {
@@ -147,7 +145,6 @@ func (self *Service) goStart(data IFxManagerData) {
 				},
 			},
 			{
-				PubSubHandler:  false,
 				BreakOnSuccess: true,
 				Cb: func(next interface{}, message interface{}) (bool, error) {
 					if unk, ok := next.(IDataShutDown.IDataShutDown); ok {
@@ -170,7 +167,7 @@ loop:
 			if !ok {
 				return
 			}
-			breakLoop, err := channelHandlerCallback(event, false)
+			breakLoop, err := channelHandlerCallback(event)
 			if err != nil || breakLoop {
 				break
 			}
