@@ -5,9 +5,11 @@ import (
 	"github.com/bhbosman/goFxAppManager/FxServicesSlide/internal"
 	"github.com/bhbosman/goFxAppManager/Serivce"
 	"github.com/bhbosman/goUi/ui"
+	"github.com/bhbosman/gocommon/GoFunctionCounter"
 	"github.com/cskr/pubsub"
 	"github.com/rivo/tview"
 	"go.uber.org/fx"
+	"go.uber.org/zap"
 )
 
 func ProvideServiceSlide() fx.Option {
@@ -34,6 +36,8 @@ func ProvideServiceSlide() fx.Option {
 						ApplicationContext context.Context `name:"Application"`
 						PubSub             *pubsub.PubSub  `name:"Application"`
 						Lifecycle          fx.Lifecycle
+						Logger             *zap.Logger
+						GoFunctionCounter  GoFunctionCounter.IService
 						OnData             func() (internal.IFxManagerData, error)
 					},
 				) (internal.IFxManagerService, error) {
@@ -41,6 +45,8 @@ func ProvideServiceSlide() fx.Option {
 						params.ApplicationContext,
 						params.OnData,
 						params.PubSub,
+						params.Logger,
+						params.GoFunctionCounter,
 					)
 					if err != nil {
 						return nil, err

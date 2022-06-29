@@ -2,6 +2,7 @@ package FxServicesSlide
 
 import (
 	"github.com/bhbosman/goFxAppManager/FxServicesSlide/internal"
+	"github.com/bhbosman/goUi/ui"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
@@ -20,8 +21,6 @@ func (self *FxServicesManagerSlide) UpdateContent() error {
 }
 
 func (self *FxServicesManagerSlide) Close() error {
-	//self.cancelFunc()
-	//close(self.channel)
 	return nil
 }
 
@@ -57,91 +56,6 @@ func (self *FxServicesManagerSlide) MouseHandler() func(action tview.MouseAction
 	return self.next.MouseHandler()
 }
 
-//func (self *FxServicesManagerSlide) goRun() {
-//	defer func(cmdChannel <-chan interface{}) {
-//		//flush
-//		for range cmdChannel {
-//		}
-//	}(self.channel)
-//
-//	pubSubChannel := self.pubSub.Sub("ActiveFxServicesStatus")
-//	defer func(pubSubChannel chan interface{}) {
-//		// unsubscribe on different go routine to avoid deadlock
-//		go func(pubSubChannel chan interface{}) {
-//			self.pubSub.Unsub(pubSubChannel)
-//			for range pubSubChannel {
-//			}
-//		}(pubSubChannel)
-//	}(pubSubChannel)
-//
-//	var messageReceived interface{}
-//	var ok bool
-//
-//	channelHandlerCallback := ChannelHandler.CreateChannelHandlerCallback(
-//		self.ctx,
-//		self.data,
-//		[]ChannelHandler.ChannelHandler{
-//			{
-//				BreakOnSuccess: false,
-//				Cb: func(next interface{}, message interface{}) (bool, error) {
-//					if unk, ok := next.(internal.IFxManagerSlide); ok {
-//						return internal.ChannelEventsForIFxManagerSlide(unk, message)
-//					}
-//					return false, nil
-//				},
-//			},
-//			{
-//				PubSubHandler:  false,
-//				BreakOnSuccess: false,
-//				Cb: func(next interface{}, message interface{}) (bool, error) {
-//					if unk, ok := next.(ISendMessage.ISendMessage); ok {
-//						return ISendMessage.ChannelEventsForISendMessage(unk, message)
-//					}
-//					return false, nil
-//				},
-//			},
-//			{
-//				PubSubHandler:  true,
-//				BreakOnSuccess: false,
-//				Cb: func(next interface{}, message interface{}) (bool, error) {
-//					if sm, ok := next.(ISendMessage.ISendMessage); ok {
-//						_ = sm.Send(message)
-//					}
-//					return true, nil
-//				},
-//			},
-//		},
-//		func() int {
-//			n := len(pubSubChannel) + len(self.channel)
-//			return n
-//		})
-//loop:
-//	for {
-//		select {
-//		case <-self.ctx.Done():
-//			break loop
-//		case messageReceived, ok = <-self.channel:
-//			if !ok {
-//				return
-//			}
-//			b, err := channelHandlerCallback(messageReceived, false)
-//			if err != nil || b {
-//				return
-//			}
-//			break
-//		case messageReceived, ok = <-pubSubChannel:
-//			if !ok {
-//				return
-//			}
-//			b, err := channelHandlerCallback(messageReceived, true)
-//			if err != nil || b {
-//				return
-//			}
-//			break
-//		}
-//	}
-//}
-
 func (self *FxServicesManagerSlide) SetFxServiceListChange(list []internal.IdAndName) {
 	self.app.QueueUpdateDraw(func() {
 		self.plate = newFxAppManagerPlateContent(list)
@@ -159,7 +73,7 @@ func (self *FxServicesManagerSlide) SetFxServiceInstanceChange(data internal.Sen
 			if action == StopServiceString {
 				self.actionList.AddItem(action, "", 0,
 					func() {
-						self.service.StartService(data.Name)
+						self.service.StopService(data.Name)
 						self.app.SetFocus(self.table)
 					},
 				)
@@ -232,13 +146,12 @@ func (self *FxServicesManagerSlide) init() {
 			0,
 			1,
 			true)
-
 }
 
 func NewFxServiceSlide(
 	service internal.IFxManagerService,
 	app *tview.Application,
-) *FxServicesManagerSlide {
+) ui.IPrimitiveCloser {
 
 	result := &FxServicesManagerSlide{
 		service: service,

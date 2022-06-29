@@ -4,10 +4,11 @@ import (
 	"context"
 	"github.com/bhbosman/goFxAppManager/FxServicesSlide/internal"
 	"github.com/bhbosman/gocommon/ChannelHandler"
-	"github.com/bhbosman/gocommon/Services/IDataShutDown"
+	"github.com/bhbosman/gocommon/GoFunctionCounter"
 	"github.com/bhbosman/gocommon/Services/IFxService"
 	"github.com/bhbosman/gocommon/Services/ISendMessage"
 	"github.com/cskr/pubsub"
+	"go.uber.org/zap"
 )
 
 type Service struct {
@@ -19,6 +20,8 @@ type Service struct {
 	pubSub                   *pubsub.PubSub
 	connectionListChange     func(connectionList []internal.IdAndName)
 	connectionInstanceChange func(data internal.SendActionsForService)
+	logger                   *zap.Logger
+	goFunctionCounter        GoFunctionCounter.IService
 }
 
 func (self *Service) Send(message interface{}) error {
@@ -69,7 +72,19 @@ func (self *Service) start(_ context.Context) error {
 	}
 	data.SetConnectionListChange(self.connectionListChange)
 	data.SetConnectionInstanceChange(self.connectionInstanceChange)
-	go self.goStart(data)
+
+	// this function is part of the GoFunctionCounter count
+	go func() {
+		functionName := self.goFunctionCounter.CreateFunctionName("FxServiceSlide.Start")
+		defer func(GoFunctionCounter GoFunctionCounter.IService, name string) {
+			_ = GoFunctionCounter.Remove(name)
+		}(self.goFunctionCounter, functionName)
+		_ = self.goFunctionCounter.Add(functionName)
+
+		//
+		self.goStart(data)
+	}()
+
 	return nil
 }
 func (self *Service) goStart(data internal.IFxManagerData) {
@@ -82,7 +97,16 @@ func (self *Service) goStart(data internal.IFxManagerData) {
 	pubSubChannel := self.pubSub.Sub("ActiveFxServicesStatus")
 	defer func(pubSubChannel chan interface{}) {
 		// unsubscribe on different go routine to avoid deadlock
+
+		// this function is part of the GoFunctionCounter count
 		go func(pubSubChannel chan interface{}) {
+			functionName := self.goFunctionCounter.CreateFunctionName("FxAppManager.PubSub.Unsubscribe")
+			defer func(GoFunctionCounter GoFunctionCounter.IService, name string) {
+				_ = GoFunctionCounter.Remove(name)
+			}(self.goFunctionCounter, functionName)
+			_ = self.goFunctionCounter.Add(functionName)
+
+			//
 			self.pubSub.Unsub(pubSubChannel)
 			//flush
 			for range pubSubChannel {
@@ -116,15 +140,6 @@ func (self *Service) goStart(data internal.IFxManagerData) {
 				},
 			},
 			{
-				BreakOnSuccess: true,
-				Cb: func(next interface{}, message interface{}) (bool, error) {
-					if unk, ok := next.(IDataShutDown.IDataShutDown); ok {
-						return IDataShutDown.ChannelEventsForIDataShutDown(unk, message)
-					}
-					return false, nil
-				},
-			},
-			{
 				BreakOnSuccess: false,
 				Cb: func(next interface{}, message interface{}) (bool, error) {
 					if sm, ok := next.(ISendMessage.ISendMessage); ok {
@@ -142,6 +157,12 @@ loop:
 	for {
 		select {
 		case <-self.ctx.Done():
+			err := data.ShutDown()
+			if err != nil {
+				self.logger.Error(
+					"error on done",
+					zap.Error(err))
+			}
 			break loop
 		case messageReceived, ok = <-self.channel:
 			if !ok {
@@ -173,12 +194,8 @@ func (self *Service) OnStop(ctx context.Context) error {
 }
 
 func (self *Service) shutdown(_ context.Context) error {
-	data, err := IDataShutDown.CallIDataShutDownShutDown(self.ctx, self.channel, true)
-	if err != nil {
-		return err
-	}
 	self.cancelFunc()
-	return data.Args0
+	return nil
 }
 
 func (self *Service) State() IFxService.State {
@@ -195,14 +212,18 @@ func NewService(
 	applicationContext context.Context,
 	OnData func() (internal.IFxManagerData, error),
 	pubSub *pubsub.PubSub,
+	logger *zap.Logger,
+	goFunctionCounter GoFunctionCounter.IService,
 ) (internal.IFxManagerService, error) {
 	ctx, cancelFunc := context.WithCancel(applicationContext)
 	channel := make(chan interface{}, 32)
 	return &Service{
-		ctx:        ctx,
-		cancelFunc: cancelFunc,
-		channel:    channel,
-		OnData:     OnData,
-		pubSub:     pubSub,
+		ctx:               ctx,
+		cancelFunc:        cancelFunc,
+		channel:           channel,
+		OnData:            OnData,
+		pubSub:            pubSub,
+		logger:            logger,
+		goFunctionCounter: goFunctionCounter,
 	}, nil
 }

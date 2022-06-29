@@ -3,6 +3,7 @@ package Serivce
 import (
 	"context"
 	"github.com/bhbosman/goFxAppManager/Serivce/internal"
+	"github.com/bhbosman/gocommon/GoFunctionCounter"
 	"github.com/bhbosman/gocommon/messages"
 	"github.com/cskr/pubsub"
 	"go.uber.org/fx"
@@ -40,11 +41,15 @@ func ProvideFxManager() fx.Option {
 						OnData             internal.OnDataCallback
 						ApplicationContext context.Context `name:"Application"`
 						PubSub             *pubsub.PubSub  `name:"Application"`
+						Logger             *zap.Logger
+						GoFunctionCounter  GoFunctionCounter.IService
 					},
 				) (IFxManagerService, error) {
 					return internal.NewFxManagerService(
 						params.ApplicationContext,
 						params.OnData,
+						params.Logger,
+						params.GoFunctionCounter,
 					)
 				},
 			},

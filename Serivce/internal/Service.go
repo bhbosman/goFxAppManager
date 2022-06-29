@@ -3,19 +3,22 @@ package internal
 import (
 	"context"
 	"github.com/bhbosman/gocommon/ChannelHandler"
-	"github.com/bhbosman/gocommon/Services/IDataShutDown"
+	"github.com/bhbosman/gocommon/GoFunctionCounter"
 	"github.com/bhbosman/gocommon/Services/IFxService"
 	"github.com/bhbosman/gocommon/Services/ISendMessage"
+	"go.uber.org/zap"
 )
 
 type OnDataCallback func(applicationContext context.Context) (IFxManagerData, error)
 
 type Service struct {
-	context    context.Context
-	cancelFunc context.CancelFunc
-	channel    chan interface{}
-	onData     OnDataCallback
-	state      IFxService.State
+	context           context.Context
+	cancelFunc        context.CancelFunc
+	channel           chan interface{}
+	onData            OnDataCallback
+	state             IFxService.State
+	logger            *zap.Logger
+	goFunctionCounter GoFunctionCounter.IService
 }
 
 func (self *Service) ServiceName() string {
@@ -26,14 +29,21 @@ func (self *Service) State() IFxService.State {
 	return self.state
 }
 
-func NewFxManagerService(applicationContext context.Context, onData OnDataCallback) (*Service, error) {
+func NewFxManagerService(
+	applicationContext context.Context,
+	onData OnDataCallback,
+	logger *zap.Logger,
+	goFunctionCounter GoFunctionCounter.IService,
+) (*Service, error) {
 	ctx, cancelFunc := context.WithCancel(applicationContext)
 	return &Service{
-		context:    ctx,
-		cancelFunc: cancelFunc,
-		channel:    make(chan interface{}, 32),
-		onData:     onData,
-		state:      IFxService.NotInitialized,
+		context:           ctx,
+		cancelFunc:        cancelFunc,
+		channel:           make(chan interface{}, 32),
+		onData:            onData,
+		state:             IFxService.NotInitialized,
+		logger:            logger,
+		goFunctionCounter: goFunctionCounter,
 	}, nil
 }
 
@@ -103,17 +113,24 @@ func (self *Service) start() error {
 	if err != nil {
 		return err
 	}
-	go self.goStart(data)
+
+	// this function is part of the GoFunctionCounter count
+	go func() {
+		functionName := self.goFunctionCounter.CreateFunctionName("FxAppManager.start")
+		defer func(GoFunctionCounter GoFunctionCounter.IService, name string) {
+			_ = GoFunctionCounter.Remove(name)
+		}(self.goFunctionCounter, functionName)
+		_ = self.goFunctionCounter.Add(functionName)
+
+		//
+		self.goStart(data)
+	}()
 	return nil
 }
 
 func (self *Service) shutdown() error {
-	data, err := IDataShutDown.CallIDataShutDownShutDown(self.context, self.channel, true)
-	if err != nil {
-		return err
-	}
 	self.cancelFunc()
-	return data.Args0
+	return nil
 }
 
 func (self *Service) goStart(data IFxManagerData) {
@@ -144,15 +161,6 @@ func (self *Service) goStart(data IFxManagerData) {
 					return false, nil
 				},
 			},
-			{
-				BreakOnSuccess: true,
-				Cb: func(next interface{}, message interface{}) (bool, error) {
-					if unk, ok := next.(IDataShutDown.IDataShutDown); ok {
-						return IDataShutDown.ChannelEventsForIDataShutDown(unk, message)
-					}
-					return false, nil
-				},
-			},
 		},
 		func() int {
 			return len(self.channel)
@@ -162,6 +170,12 @@ loop:
 	for {
 		select {
 		case <-self.context.Done():
+			err := data.ShutDown()
+			if err != nil {
+				self.logger.Error(
+					"error on done",
+					zap.Error(err))
+			}
 			break loop
 		case event, ok := <-self.channel:
 			if !ok {
