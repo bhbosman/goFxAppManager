@@ -23,15 +23,14 @@ require (
 	github.com/rivo/uniseg v0.2.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/dig v1.14.0 // indirect
+	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f // indirect
 	golang.org/x/sys v0.0.0-20220318055525-2edf467146b5 // indirect
 	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d // indirect
 	golang.org/x/text v0.3.7 // indirect
 )
 
-replace github.com/bhbosman/goUi => ../goUi
-
 replace github.com/golang/mock => github.com/bhbosman/gomock v1.6.1-0.20220617134815-f277ff266f47
 
-replace github.com/bhbosman/goConnectionManager => ../goConnectionManager
+replace github.com/bhbosman/goUi => ../goUi
 
 replace github.com/bhbosman/gocommon => ../gocommon
