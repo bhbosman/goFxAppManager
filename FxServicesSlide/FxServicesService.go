@@ -122,7 +122,7 @@ func (self *Service) goStart(data internal.IFxManagerData) {
 		data,
 		[]ChannelHandler.ChannelHandler{
 			{
-				BreakOnSuccess: false,
+				//BreakOnSuccess: false,
 				Cb: func(next interface{}, message interface{}) (bool, error) {
 					if unk, ok := next.(internal.IFxManagerSlide); ok {
 						return internal.ChannelEventsForIFxManagerSlide(unk, message)
@@ -131,7 +131,7 @@ func (self *Service) goStart(data internal.IFxManagerData) {
 				},
 			},
 			{
-				BreakOnSuccess: false,
+				//BreakOnSuccess: false,
 				Cb: func(next interface{}, message interface{}) (bool, error) {
 					if unk, ok := next.(ISendMessage.ISendMessage); ok {
 						return ISendMessage.ChannelEventsForISendMessage(unk, message)
@@ -140,7 +140,7 @@ func (self *Service) goStart(data internal.IFxManagerData) {
 				},
 			},
 			{
-				BreakOnSuccess: false,
+				//BreakOnSuccess: false,
 				Cb: func(next interface{}, message interface{}) (bool, error) {
 					if sm, ok := next.(ISendMessage.ISendMessage); ok {
 						_ = sm.Send(message)
