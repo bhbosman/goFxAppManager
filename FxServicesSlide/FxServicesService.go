@@ -73,19 +73,14 @@ func (self *Service) start(_ context.Context) error {
 	data.SetConnectionListChange(self.connectionListChange)
 	data.SetConnectionInstanceChange(self.connectionInstanceChange)
 
-	// this function is part of the GoFunctionCounter count
-	go func() {
-		functionName := self.goFunctionCounter.CreateFunctionName("FxServiceSlide.Start")
-		defer func(GoFunctionCounter GoFunctionCounter.IService, name string) {
-			_ = GoFunctionCounter.Remove(name)
-		}(self.goFunctionCounter, functionName)
-		_ = self.goFunctionCounter.Add(functionName)
-
-		//
-		self.goStart(data)
-	}()
-
-	return nil
+	return self.goFunctionCounter.GoRun("FxServiceSlide.Start",
+		func(data interface{}) {
+			if unk, ok := data.(internal.IFxManagerData); ok {
+				self.goStart(unk)
+			}
+		},
+		data,
+	)
 }
 func (self *Service) goStart(data internal.IFxManagerData) {
 	defer func(cmdChannel <-chan interface{}) {
@@ -97,21 +92,19 @@ func (self *Service) goStart(data internal.IFxManagerData) {
 	pubSubChannel := self.pubSub.Sub("ActiveFxServicesStatus")
 	defer func(pubSubChannel chan interface{}) {
 		// unsubscribe on different go routine to avoid deadlock
-
+		self.goFunctionCounter.GoRun("FxAppManager.PubSub.Unsubscribe",
+			func(data interface{}) {
+				if unk, ok := data.(chan interface{}); ok {
+					self.pubSub.Unsub(unk)
+					//flush
+					for range unk {
+					}
+				}
+			},
+			pubSubChannel,
+		)
 		// this function is part of the GoFunctionCounter count
-		go func(pubSubChannel chan interface{}) {
-			functionName := self.goFunctionCounter.CreateFunctionName("FxAppManager.PubSub.Unsubscribe")
-			defer func(GoFunctionCounter GoFunctionCounter.IService, name string) {
-				_ = GoFunctionCounter.Remove(name)
-			}(self.goFunctionCounter, functionName)
-			_ = self.goFunctionCounter.Add(functionName)
 
-			//
-			self.pubSub.Unsub(pubSubChannel)
-			//flush
-			for range pubSubChannel {
-			}
-		}(pubSubChannel)
 	}(pubSubChannel)
 
 	var messageReceived interface{}

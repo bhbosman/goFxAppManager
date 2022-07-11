@@ -114,18 +114,14 @@ func (self *Service) start() error {
 		return err
 	}
 
-	// this function is part of the GoFunctionCounter count
-	go func() {
-		functionName := self.goFunctionCounter.CreateFunctionName("FxAppManager.start")
-		defer func(GoFunctionCounter GoFunctionCounter.IService, name string) {
-			_ = GoFunctionCounter.Remove(name)
-		}(self.goFunctionCounter, functionName)
-		_ = self.goFunctionCounter.Add(functionName)
-
-		//
-		self.goStart(data)
-	}()
-	return nil
+	return self.goFunctionCounter.GoRun("FxAppManager.start",
+		func(data interface{}) {
+			if unk, ok := data.(IFxManagerData); ok {
+				self.goStart(unk)
+			}
+		},
+		data,
+	)
 }
 
 func (self *Service) shutdown() error {
