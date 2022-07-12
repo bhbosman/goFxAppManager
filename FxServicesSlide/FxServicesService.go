@@ -74,12 +74,10 @@ func (self *Service) start(_ context.Context) error {
 	data.SetConnectionInstanceChange(self.connectionInstanceChange)
 
 	return self.goFunctionCounter.GoRun("FxServiceSlide.Start",
-		func(data interface{}) {
-			if unk, ok := data.(internal.IFxManagerData); ok {
-				self.goStart(unk)
-			}
+		func(interface{}) {
+			self.goStart(data)
 		},
-		data,
+		nil,
 	)
 }
 func (self *Service) goStart(data internal.IFxManagerData) {
@@ -93,15 +91,12 @@ func (self *Service) goStart(data internal.IFxManagerData) {
 	defer func(pubSubChannel chan interface{}) {
 		// unsubscribe on different go routine to avoid deadlock
 		self.goFunctionCounter.GoRun("FxAppManager.PubSub.Unsubscribe",
-			func(data interface{}) {
-				if unk, ok := data.(chan interface{}); ok {
-					self.pubSub.Unsub(unk)
-					//flush
-					for range unk {
-					}
+			func(interface{}) {
+				self.pubSub.Unsub(pubSubChannel)
+				for range pubSubChannel {
 				}
 			},
-			pubSubChannel,
+			nil,
 		)
 		// this function is part of the GoFunctionCounter count
 
