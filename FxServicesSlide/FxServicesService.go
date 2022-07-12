@@ -7,6 +7,7 @@ import (
 	"github.com/bhbosman/gocommon/GoFunctionCounter"
 	"github.com/bhbosman/gocommon/Services/IFxService"
 	"github.com/bhbosman/gocommon/Services/ISendMessage"
+	"github.com/bhbosman/gocommon/pubSub"
 	"github.com/cskr/pubsub"
 	"go.uber.org/zap"
 )
@@ -88,19 +89,9 @@ func (self *Service) goStart(data internal.IFxManagerData) {
 	}(self.channel)
 
 	pubSubChannel := self.pubSub.Sub("ActiveFxServicesStatus")
-	defer func(pubSubChannel chan interface{}) {
-		// unsubscribe on different go routine to avoid deadlock
-		self.goFunctionCounter.GoRun("FxAppManager.PubSub.Unsubscribe",
-			func(interface{}) {
-				self.pubSub.Unsub(pubSubChannel)
-				for range pubSubChannel {
-				}
-			},
-			nil,
-		)
-		// this function is part of the GoFunctionCounter count
-
-	}(pubSubChannel)
+	defer func() {
+		_ = pubSub.Unsubscribe("FxAppManager.PubSub.Unsubscribe", self.pubSub, self.goFunctionCounter, pubSubChannel)
+	}()
 
 	var messageReceived interface{}
 	var ok bool
