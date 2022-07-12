@@ -75,10 +75,9 @@ func (self *Service) start(_ context.Context) error {
 	data.SetConnectionInstanceChange(self.connectionInstanceChange)
 
 	return self.goFunctionCounter.GoRun("FxServiceSlide.Start",
-		func(interface{}) {
+		func() {
 			self.goStart(data)
 		},
-		nil,
 	)
 }
 func (self *Service) goStart(data internal.IFxManagerData) {

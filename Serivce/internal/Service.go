@@ -115,10 +115,9 @@ func (self *Service) start() error {
 	}
 
 	return self.goFunctionCounter.GoRun("FxAppManager.start",
-		func(interface{}) {
+		func() {
 			self.goStart(data)
 		},
-		nil,
 	)
 }
 
