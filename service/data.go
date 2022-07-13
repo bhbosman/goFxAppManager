@@ -1,31 +1,30 @@
-package internal
+package service
 
 import (
 	"context"
-	model2 "github.com/bhbosman/goFxAppManager/Serivce/model"
 	"github.com/bhbosman/gocommon/messageRouter"
 	"github.com/bhbosman/gocommon/messages"
 	"github.com/bhbosman/gocommon/model"
 	"github.com/cskr/pubsub"
-	"go.uber.org/fx"
 	"go.uber.org/multierr"
 	"go.uber.org/zap"
 	"reflect"
 )
 
-type fxApplicationInformation struct {
+type FxApplicationInformation struct {
+	Name              string
+	Callback          messages.CreateAppCallbackFn
 	ServiceId         model.ServiceIdentifier
 	ServiceDependency model.ServiceIdentifier
 	isDirty           bool
-	Name              string
-	Callback          messages.CreateAppCallbackFn
 }
 
-func newFxApplicationInformation(
+func NewFxApplicationInformation(
 	ServiceId model.ServiceIdentifier,
 	ServiceDependency model.ServiceIdentifier,
-	name string, callback messages.CreateAppCallbackFn) *fxApplicationInformation {
-	return &fxApplicationInformation{
+	name string, callback messages.CreateAppCallbackFn,
+) *FxApplicationInformation {
+	return &FxApplicationInformation{
 		ServiceId:         ServiceId,
 		ServiceDependency: ServiceDependency,
 		isDirty:           true,
@@ -34,65 +33,40 @@ func newFxApplicationInformation(
 	}
 }
 
-type Data struct {
+type data struct {
 	isDirty                 bool
 	appContext              context.Context
 	pubSub                  *pubsub.PubSub
-	fxCreateAppsCallbackMap map[string]*fxApplicationInformation
-	fxAppsMap               map[string]*fx.App
+	fxCreateAppsCallbackMap map[string]*FxApplicationInformation
+	fxAppsMap               map[string]messages.IApp
 	messageRouter           *messageRouter.MessageRouter
 	logger                  *zap.Logger
 }
 
-func NewData(
-	applicationContext context.Context,
-	FnApps []messages.CreateAppCallback,
-	pubSub *pubsub.PubSub,
-	logger *zap.Logger) (*Data, error) {
-	result := &Data{
-		appContext:              applicationContext,
-		pubSub:                  pubSub,
-		fxCreateAppsCallbackMap: make(map[string]*fxApplicationInformation),
-		fxAppsMap:               make(map[string]*fx.App),
-		messageRouter:           messageRouter.NewMessageRouter(),
-		logger:                  logger,
-	}
-	result.messageRouter.Add(result.handleEmptyQueue)
-
-	for _, app := range FnApps {
-		result.fxCreateAppsCallbackMap[app.Name] = newFxApplicationInformation(
-			app.ServiceId,
-			app.ServiceDependency,
-			app.Name,
-			app.Callback)
-		result.isDirty = true
-		result.publish(
-			&model2.FxServiceAdded{
-				Name: app.Name,
-			})
-	}
-
-	return result, nil
+func (self *data) Add(name string, callback messages.CreateAppCallbackFn, serviceId model.ServiceIdentifier, serviceDependency model.ServiceIdentifier) error {
+	self.fxCreateAppsCallbackMap[name] = NewFxApplicationInformation(
+		serviceId,
+		serviceDependency,
+		name,
+		callback)
+	self.isDirty = true
+	self.publish(
+		&FxServiceAdded{
+			Name: name,
+		},
+	)
+	return nil
 }
 
-func (self *Data) StopAll(ctx context.Context) error {
-	if self.appContext.Err() != nil {
-		self.logger.Error("App Context in Error",
-			zap.String("Method", "StopAll"),
-			zap.Error(self.appContext.Err()))
-		return self.appContext.Err()
-	}
+func (self *data) StopAll(ctx context.Context) error {
 	var err error
-	self.logger.Error("Starting all services",
-		zap.String("Method", "StartAll"),
-		zap.Error(self.appContext.Err()))
 	for name := range self.fxCreateAppsCallbackMap {
 		err = multierr.Append(err, self.Stop(ctx, name))
 	}
 	return err
 }
 
-func (self *Data) StartAll(startContext context.Context) error {
+func (self *data) StartAll(startContext context.Context) error {
 	if self.appContext.Err() != nil {
 		self.logger.Error("App Context in Error",
 			zap.String("Method", "StartAll"),
@@ -109,20 +83,15 @@ func (self *Data) StartAll(startContext context.Context) error {
 	return err
 }
 
-func (self *Data) Stop(stopContext context.Context, name ...string) error {
-	if self.appContext.Err() != nil {
-		self.logger.Error("App Context in Error",
-			zap.String("Method", "Stop"),
-			zap.Error(self.appContext.Err()))
-		return self.appContext.Err()
-	}
+func (self *data) Stop(stopContext context.Context, name ...string) error {
 	var err error
-	err = nil
 	for _, iterName := range name {
-		// check if not in started list
 		var ok bool
-		var app *fx.App
+		var app messages.IApp
 		if app, ok = self.fxAppsMap[iterName]; ok {
+			if app == nil {
+				continue
+			}
 			err = app.Stop(stopContext)
 			delete(self.fxAppsMap, iterName)
 			if instance, ok := self.fxCreateAppsCallbackMap[iterName]; ok {
@@ -134,7 +103,7 @@ func (self *Data) Stop(stopContext context.Context, name ...string) error {
 	return err
 }
 
-func (self *Data) Start(startContext context.Context, name ...string) error {
+func (self *data) Start(startContext context.Context, name ...string) error {
 	if self.appContext.Err() != nil {
 		self.logger.Error("App Context in Error",
 			zap.String("Method", "Start"),
@@ -144,13 +113,17 @@ func (self *Data) Start(startContext context.Context, name ...string) error {
 	}
 	var err error
 	err = nil
-	self.logger.Info("Starting service", zap.String("Method", "Start"), zap.Error(self.appContext.Err()), zap.Strings("name", name))
+	self.logger.Info(
+		"Starting service",
+		zap.String("Method", "Start"),
+		zap.Error(self.appContext.Err()),
+		zap.Strings("name", name))
 	for _, iterName := range name {
 		// check if not in started list
 
 		var ok bool
-		var applicationInformation *fxApplicationInformation
-		var app *fx.App
+		var applicationInformation *FxApplicationInformation
+		var app messages.IApp
 		var cancelFunc context.CancelFunc
 		self.logger.Info("Check if already started", zap.String("ServiceName", iterName))
 		if _, ok = self.fxAppsMap[iterName]; !ok {
@@ -165,7 +138,7 @@ func (self *Data) Start(startContext context.Context, name ...string) error {
 				}
 
 				if err == nil {
-					self.publish(&model2.FxServiceStarted{
+					self.publish(&FxServiceStarted{
 						Name: iterName,
 					})
 					applicationInformation.isDirty = true
@@ -191,11 +164,11 @@ func (self *Data) Start(startContext context.Context, name ...string) error {
 	return err
 }
 
-func (self *Data) ShutDown() error {
-	return self.appContext.Err()
+func (self *data) ShutDown() error {
+	return self.StopAll(context.Background())
 }
 
-func (self *Data) Send(message interface{}) error {
+func (self *data) Send(message interface{}) error {
 	if self.appContext.Err() != nil {
 		self.logger.Error("App Context in Error",
 			zap.String("Method", "Send"),
@@ -211,11 +184,11 @@ func (self *Data) Send(message interface{}) error {
 	return nil
 }
 
-func (self *Data) publish(message interface{}) {
+func (self *data) publish(message interface{}) {
 	self.pubSub.Pub(message, "ActiveFxServicesStatus")
 }
 
-func (self *Data) handleEmptyQueue(message *messages.EmptyQueue) interface{} {
+func (self *data) handleEmptyQueue(message *messages.EmptyQueue) interface{} {
 	if self.appContext.Err() != nil {
 		self.logger.Error("App Context in Error",
 			zap.String("Method", "Send"),
@@ -229,7 +202,7 @@ func (self *Data) handleEmptyQueue(message *messages.EmptyQueue) interface{} {
 			if information.isDirty {
 				_, active := self.fxAppsMap[information.Name]
 				self.publish(
-					&model2.FxServiceStatus{
+					&FxServiceStatus{
 						Name:              information.Name,
 						Active:            active,
 						ServiceId:         information.ServiceId,
@@ -241,4 +214,34 @@ func (self *Data) handleEmptyQueue(message *messages.EmptyQueue) interface{} {
 		self.isDirty = false
 	}
 	return nil
+}
+
+func NewData(
+	applicationContext context.Context,
+	FnApps []messages.CreateAppCallback,
+	pubSub *pubsub.PubSub,
+	logger *zap.Logger) (*data, error) {
+	result := &data{
+		appContext:              applicationContext,
+		pubSub:                  pubSub,
+		fxCreateAppsCallbackMap: make(map[string]*FxApplicationInformation),
+		fxAppsMap:               make(map[string]messages.IApp),
+		messageRouter:           messageRouter.NewMessageRouter(),
+		logger:                  logger,
+	}
+	result.messageRouter.Add(result.handleEmptyQueue)
+	var err error
+	for _, app := range FnApps {
+		err = multierr.Append(
+			err,
+			result.Add(
+				app.Name,
+				app.Callback,
+				app.ServiceId,
+				app.ServiceDependency,
+			),
+		)
+	}
+
+	return result, nil
 }

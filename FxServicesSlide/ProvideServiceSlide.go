@@ -3,7 +3,7 @@ package FxServicesSlide
 import (
 	"context"
 	"github.com/bhbosman/goFxAppManager/FxServicesSlide/internal"
-	"github.com/bhbosman/goFxAppManager/Serivce"
+	"github.com/bhbosman/goFxAppManager/service"
 	"github.com/bhbosman/goUi/ui"
 	"github.com/bhbosman/gocommon/GoFunctionCounter"
 	"github.com/cskr/pubsub"
@@ -19,7 +19,7 @@ func ProvideServiceSlide() fx.Option {
 				Target: func(
 					params struct {
 						fx.In
-						FxManagerService Serivce.IFxManagerService
+						FxManagerService service.IFxManagerService
 					},
 				) (func() (internal.IFxManagerData, error), error) {
 					return func() (internal.IFxManagerData, error) {

@@ -2,7 +2,7 @@ package FxServicesSlide
 
 import "github.com/bhbosman/gocommon/model"
 
-type PublishInstanceDataFor struct {
+type publishInstanceDataFor struct {
 	Name string
 }
 

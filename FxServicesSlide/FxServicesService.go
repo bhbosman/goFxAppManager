@@ -8,6 +8,7 @@ import (
 	"github.com/bhbosman/gocommon/Services/IFxService"
 	"github.com/bhbosman/gocommon/Services/ISendMessage"
 	"github.com/bhbosman/gocommon/pubSub"
+	"github.com/bhbosman/gocommon/uiCommon"
 	"github.com/cskr/pubsub"
 	"go.uber.org/zap"
 )
@@ -23,6 +24,7 @@ type Service struct {
 	connectionInstanceChange func(data internal.SendActionsForService)
 	logger                   *zap.Logger
 	goFunctionCounter        GoFunctionCounter.IService
+	pubSubChannel            chan interface{}
 }
 
 func (self *Service) Send(message interface{}) error {
@@ -87,10 +89,7 @@ func (self *Service) goStart(data internal.IFxManagerData) {
 		}
 	}(self.channel)
 
-	pubSubChannel := self.pubSub.Sub("ActiveFxServicesStatus")
-	defer func() {
-		_ = pubSub.Unsubscribe("FxAppManager.PubSub.Unsubscribe", self.pubSub, self.goFunctionCounter, pubSubChannel)
-	}()
+	self.pubSubChannel = self.pubSub.Sub("ActiveFxServicesStatus", uiCommon.UIState)
 
 	var messageReceived interface{}
 	var ok bool
@@ -128,7 +127,7 @@ func (self *Service) goStart(data internal.IFxManagerData) {
 			},
 		},
 		func() int {
-			n := len(pubSubChannel) + len(self.channel)
+			n := len(self.pubSubChannel) + len(self.channel)
 			return n
 		})
 loop:
@@ -151,7 +150,7 @@ loop:
 				return
 			}
 			break
-		case messageReceived, ok = <-pubSubChannel:
+		case messageReceived, ok = <-self.pubSubChannel:
 			if !ok {
 				return
 			}
@@ -173,17 +172,15 @@ func (self *Service) OnStop(ctx context.Context) error {
 
 func (self *Service) shutdown(_ context.Context) error {
 	self.cancelFunc()
-	return nil
+	return pubSub.Unsubscribe("FxAppManager.PubSub.Unsubscribe", self.pubSub, self.goFunctionCounter, self.pubSubChannel)
 }
 
 func (self *Service) State() IFxService.State {
-	//TODO implement me
-	panic("implement me")
+	return self.state
 }
 
 func (self *Service) ServiceName() string {
-	//TODO implement me
-	panic("implement me")
+	return "FxServicesSlide"
 }
 
 func NewService(

@@ -14,6 +14,11 @@ type FxServicesManagerSlide struct {
 	next       tview.Primitive
 	app        *tview.Application
 	plate      *PlateContent
+	toggle     bool
+}
+
+func (self *FxServicesManagerSlide) Toggle(b bool) {
+	self.toggle = b
 }
 
 func (self *FxServicesManagerSlide) UpdateContent() error {
@@ -126,7 +131,7 @@ func (self *FxServicesManagerSlide) init() {
 		SetSelectionChangedFunc(
 			func(row, column int) {
 				_ = self.service.Send(
-					&PublishInstanceDataFor{
+					&publishInstanceDataFor{
 						Name: self.plate.Grid[row-1].Name,
 					},
 				)

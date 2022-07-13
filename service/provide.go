@@ -1,8 +1,7 @@
-package Serivce
+package service
 
 import (
 	"context"
-	"github.com/bhbosman/goFxAppManager/Serivce/internal"
 	"github.com/bhbosman/gocommon/GoFunctionCounter"
 	"github.com/bhbosman/gocommon/messages"
 	"github.com/cskr/pubsub"
@@ -21,8 +20,10 @@ func InvokeFxManager() fx.Option {
 				},
 			) error {
 				hook := fx.Hook{
-					OnStart: params.FxManagerService.OnStart,
-					OnStop:  params.FxManagerService.OnStop,
+					OnStart: func(ctx context.Context) error {
+						return params.FxManagerService.OnStart(ctx)
+					},
+					OnStop: params.FxManagerService.OnStop,
 				}
 				params.Lifecycle.Append(hook)
 				return nil
@@ -38,14 +39,14 @@ func ProvideFxManager() fx.Option {
 				Target: func(
 					params struct {
 						fx.In
-						OnData             internal.OnDataCallback
+						OnData             OnDataCallback
 						ApplicationContext context.Context `name:"Application"`
 						PubSub             *pubsub.PubSub  `name:"Application"`
 						Logger             *zap.Logger
 						GoFunctionCounter  GoFunctionCounter.IService
 					},
 				) (IFxManagerService, error) {
-					return internal.NewFxManagerService(
+					return NewService(
 						params.ApplicationContext,
 						params.OnData,
 						params.Logger,
@@ -63,9 +64,9 @@ func ProvideFxManager() fx.Option {
 						FnApps []messages.CreateAppCallback `group:"Apps"`
 						Logger *zap.Logger
 					},
-				) internal.OnDataCallback {
-					return func(applicationContext context.Context) (internal.IFxManagerData, error) {
-						return internal.NewData(
+				) OnDataCallback {
+					return func(applicationContext context.Context) (IFxManagerData, error) {
+						return NewData(
 							applicationContext,
 							params.FnApps,
 							params.PubSub,
