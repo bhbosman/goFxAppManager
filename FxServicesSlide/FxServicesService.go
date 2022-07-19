@@ -129,7 +129,16 @@ func (self *Service) goStart(data internal.IFxManagerData) {
 		func() int {
 			n := len(self.pubSubChannel) + len(self.channel)
 			return n
-		})
+		},
+		//func(i interface{}) {
+		//	select {
+		//	case self.channel <- i:
+		//		break
+		//	default:
+		//		break
+		//	}
+		//},
+	)
 loop:
 	for {
 		select {

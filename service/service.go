@@ -152,7 +152,16 @@ func (self *service) goStart(data IFxManagerData) {
 		},
 		func() int {
 			return len(self.channel)
-		})
+		},
+		//func(i interface{}) {
+		//	select {
+		//	case self.channel <- i:
+		//		break
+		//	default:
+		//		break
+		//	}
+		//},
+	)
 
 loop:
 	for {

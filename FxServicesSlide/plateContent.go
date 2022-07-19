@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/bhbosman/goFxAppManager/FxServicesSlide/internal"
 	"github.com/rivo/tview"
+	"strconv"
 )
 
 type PlateContent struct {
@@ -17,6 +18,10 @@ func newFxAppManagerPlateContent(list []internal.IdAndName) *PlateContent {
 }
 
 func (self *PlateContent) GetCell(row, column int) *tview.TableCell {
+	if row == -1 || column == -1 {
+		return tview.NewTableCell("")
+	}
+
 	switch column {
 	case 0:
 		switch row {
@@ -25,7 +30,7 @@ func (self *PlateContent) GetCell(row, column int) *tview.TableCell {
 				SetSelectable(false).
 				SetAlign(tview.AlignRight)
 		default:
-			return tview.NewTableCell("")
+			return tview.NewTableCell(strconv.Itoa(row)).SetSelectable(false).SetAlign(tview.AlignRight)
 		}
 	case 1:
 		switch row {
