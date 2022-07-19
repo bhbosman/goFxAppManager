@@ -13,6 +13,7 @@ import (
 type fxServiceManagerSlideData struct {
 	serviceListIsDirty         bool
 	ss                         map[string]*FxServicesManagerData
+	isDirty                    map[string]bool
 	messageRouter              *messageRouter.MessageRouter
 	onConnectionListChange     func(connectionList []internal.IdAndName)
 	onConnectionInstanceChange func(data internal.SendActionsForService)
@@ -49,9 +50,7 @@ func (self *fxServiceManagerSlideData) handleUiStarted(message *uiCommon.UiStart
 }
 
 func (self *fxServiceManagerSlideData) handlePublishInstanceDataFor(message *publishInstanceDataFor) error {
-	if instance, ok := self.ss[message.Name]; ok {
-		instance.isDirty = true
-	}
+	self.isDirty[message.Name] = true
 	return nil
 }
 
@@ -61,12 +60,13 @@ func (self *fxServiceManagerSlideData) handleEmptyQueue(_ *messages.EmptyQueue) 
 			self.DoServiceListChange()
 			self.serviceListIsDirty = false
 		}
-		for _, serviceInformation := range self.ss {
-			if serviceInformation.isDirty {
-				self.DoServiceInstanceChange(serviceInformation)
-				serviceInformation.isDirty = false
+		for key := range self.isDirty {
+			if v, ok := self.ss[key]; ok {
+				self.DoServiceInstanceChange(v)
 			}
 		}
+		self.isDirty = make(map[string]bool)
+
 	}
 }
 
@@ -109,11 +109,11 @@ func (self *fxServiceManagerSlideData) DoServiceInstanceChange(data *FxServicesM
 			actions = append(actions, StartServiceString)
 		}
 		actions = append(actions, []string{"-", StartAllServiceString, StopAllServiceString}...)
-		SendActionsForService := &internal.SendActionsForService{
+		SendActionsForService := internal.SendActionsForService{
 			Name:    data.Name,
 			Actions: actions,
 		}
-		dd := *SendActionsForService
+		dd := SendActionsForService
 		self.onConnectionInstanceChange(dd)
 	}
 }
@@ -132,8 +132,8 @@ func (self *fxServiceManagerSlideData) handleFxServiceStatus(message *service.Fx
 		Active:            message.Active,
 		ServiceId:         message.ServiceId,
 		ServiceDependency: message.ServiceDependency,
-		isDirty:           true,
 	}
+	self.isDirty[message.Name] = true
 	self.serviceListIsDirty = true
 	return nil
 }
@@ -141,7 +141,8 @@ func (self *fxServiceManagerSlideData) handleFxServiceStatus(message *service.Fx
 func (self *fxServiceManagerSlideData) handleFxServiceStarted(message *service.FxServiceStarted) error {
 	if instance, ok := self.ss[message.Name]; ok {
 		instance.Active = true
-		instance.isDirty = true
+		self.isDirty[message.Name] = true
+
 	}
 	return nil
 }
@@ -149,17 +150,18 @@ func (self *fxServiceManagerSlideData) handleFxServiceStarted(message *service.F
 func (self *fxServiceManagerSlideData) handleFxServiceStopped(message *service.FxServiceStopped) error {
 	if instance, ok := self.ss[message.Name]; ok {
 		instance.Active = false
-		instance.isDirty = true
+		self.isDirty[message.Name] = true
+
 	}
 	return nil
 }
 
 func (self *fxServiceManagerSlideData) handleFxServiceAdded(message *service.FxServiceAdded) error {
 	self.ss[message.Name] = &FxServicesManagerData{
-		Name:    message.Name,
-		Active:  false,
-		isDirty: true,
+		Name:   message.Name,
+		Active: false,
 	}
+	self.isDirty[message.Name] = true
 	self.serviceListIsDirty = true
 
 	return nil
@@ -170,6 +172,7 @@ func NewData(
 ) (*fxServiceManagerSlideData, error) {
 	result := &fxServiceManagerSlideData{
 		ss:               make(map[string]*FxServicesManagerData),
+		isDirty:          make(map[string]bool),
 		messageRouter:    messageRouter.NewMessageRouter(),
 		fxManagerService: fxManagerService,
 	}

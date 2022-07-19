@@ -11,5 +11,4 @@ type FxServicesManagerData struct {
 	Active            bool
 	ServiceId         model.ServiceIdentifier
 	ServiceDependency model.ServiceIdentifier
-	isDirty           bool
 }

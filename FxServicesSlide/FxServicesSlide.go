@@ -62,59 +62,79 @@ func (self *FxServicesManagerSlide) MouseHandler() func(action tview.MouseAction
 }
 
 func (self *FxServicesManagerSlide) SetFxServiceListChange(list []internal.IdAndName) {
-	self.app.QueueUpdateDraw(func() {
-		self.plate = newFxAppManagerPlateContent(list)
-		self.table.SetContent(self.plate)
-	})
+	self.app.QueueUpdateDraw(
+		func() {
+			plateNil := self.plate == nil
+			self.plate = newFxAppManagerPlateContent(list)
+			self.table.SetContent(self.plate)
+			if plateNil {
+				row, column := self.table.GetSelection()
+				if row == 0 && self.plate != nil && len(self.plate.Grid) > 0 {
+					row = 1
+					self.table.Select(row, column)
+				}
+			}
+		},
+	)
 }
 
 func (self *FxServicesManagerSlide) SetFxServiceInstanceChange(data internal.SendActionsForService) {
-	self.app.QueueUpdateDraw(func() {
-		self.actionList.Clear()
-		self.actionList.AddItem("..", "", 0, func() {
-			self.app.SetFocus(self.table)
-		})
-		for _, action := range data.Actions {
-			if action == StopServiceString {
-				self.actionList.AddItem(action, "", 0,
-					func() {
-						self.service.StopService(data.Name)
-						self.app.SetFocus(self.table)
-					},
-				)
-				continue
+	self.app.QueueUpdateDraw(
+		func() {
+			row, _ := self.table.GetSelection()
+			if row == 0 && self.plate != nil && len(self.plate.Grid) > 0 {
+				row = 1
 			}
-			if action == StartServiceString {
-				self.actionList.AddItem(action, "", 0,
-					func() {
-						self.service.StartService(data.Name)
+			if row > 0 {
+				if self.plate.Grid[row-1].Name == data.Name {
+					self.actionList.Clear()
+					self.actionList.AddItem("..", "", 0, func() {
 						self.app.SetFocus(self.table)
-					},
-				)
-				continue
-			}
-			if action == StartAllServiceString {
-				self.actionList.AddItem(action, "", 0,
-					func() {
-						self.service.StartAllService()
-						self.app.SetFocus(self.table)
-					},
-				)
-				continue
-			}
-			if action == StopAllServiceString {
-				self.actionList.AddItem(action, "", 0,
-					func() {
-						self.service.StopAllService()
-						self.app.SetFocus(self.table)
-					},
-				)
-				continue
-			}
-			self.actionList.AddItem(action, "", 0, nil)
+					})
+					for _, action := range data.Actions {
+						if action == StopServiceString {
+							self.actionList.AddItem(action, "", 0,
+								func() {
+									self.service.StopService(data.Name)
+									self.app.SetFocus(self.table)
+								},
+							)
+							continue
+						}
+						if action == StartServiceString {
+							self.actionList.AddItem(action, "", 0,
+								func() {
+									self.service.StartService(data.Name)
+									self.app.SetFocus(self.table)
+								},
+							)
+							continue
+						}
+						if action == StartAllServiceString {
+							self.actionList.AddItem(action, "", 0,
+								func() {
+									self.service.StartAllService()
+									self.app.SetFocus(self.table)
+								},
+							)
+							continue
+						}
+						if action == StopAllServiceString {
+							self.actionList.AddItem(action, "", 0,
+								func() {
+									self.service.StopAllService()
+									self.app.SetFocus(self.table)
+								},
+							)
+							continue
+						}
+						self.actionList.AddItem(action, "", 0, nil)
 
-		}
-	})
+					}
+				}
+			}
+		},
+	)
 }
 
 func (self *FxServicesManagerSlide) init() {
@@ -122,6 +142,7 @@ func (self *FxServicesManagerSlide) init() {
 	self.actionList = tview.NewList().ShowSecondaryText(false)
 	self.actionList.SetBorder(true).SetTitle("Actions")
 	self.table = tview.NewTable()
+
 	self.table.
 		SetFixed(1, 1).
 		SetSelectable(true, false).
@@ -130,11 +151,12 @@ func (self *FxServicesManagerSlide) init() {
 		}).
 		SetSelectionChangedFunc(
 			func(row, column int) {
-				_ = self.service.Send(
-					&publishInstanceDataFor{
+				if row > 0 {
+					msg := &publishInstanceDataFor{
 						Name: self.plate.Grid[row-1].Name,
-					},
-				)
+					}
+					_ = self.service.Send(msg)
+				}
 			},
 		).
 		SetBorder(true).
