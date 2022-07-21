@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"github.com/bhbosman/goCommsDefinitions"
 	"github.com/bhbosman/gocommon/ChannelHandler"
 	"github.com/bhbosman/gocommon/GoFunctionCounter"
 	"github.com/bhbosman/gocommon/Services/IFxService"
@@ -17,7 +18,7 @@ type OnDataCallback func(applicationContext context.Context) (IFxManagerData, er
 type service struct {
 	context           context.Context
 	cancelFunc        context.CancelFunc
-	channel           chan interface{}
+	cmdChannel        chan interface{}
 	onData            OnDataCallback
 	state             IFxService.State
 	logger            *zap.Logger
@@ -25,7 +26,7 @@ type service struct {
 }
 
 func (self *service) Add(name string, callback messages.CreateAppCallbackFn, serviceId model.ServiceIdentifier, serviceDependency model.ServiceIdentifier) error {
-	add, err := CallIFxManagerAdd(self.context, self.channel, true, name, callback, serviceId, serviceDependency)
+	add, err := CallIFxManagerAdd(self.context, self.cmdChannel, true, name, callback, serviceId, serviceDependency)
 	if err != nil {
 		return err
 	}
@@ -33,7 +34,7 @@ func (self *service) Add(name string, callback messages.CreateAppCallbackFn, ser
 }
 
 func (self *service) Send(message interface{}) error {
-	send, err := CallIFxManagerSend(self.context, self.channel, false, message)
+	send, err := CallIFxManagerSend(self.context, self.cmdChannel, false, message)
 	if err != nil {
 		return err
 	}
@@ -49,7 +50,7 @@ func (self *service) State() IFxService.State {
 }
 
 func (self *service) StopAll(ctx context.Context) error {
-	result, err := CallIFxManagerStopAll(self.context, self.channel, true, ctx)
+	result, err := CallIFxManagerStopAll(self.context, self.cmdChannel, true, ctx)
 	if err != nil {
 		return err
 	}
@@ -57,7 +58,7 @@ func (self *service) StopAll(ctx context.Context) error {
 }
 
 func (self *service) StartAll(ctx context.Context) error {
-	result, err := CallIFxManagerStartAll(self.context, self.channel, true, ctx)
+	result, err := CallIFxManagerStartAll(self.context, self.cmdChannel, true, ctx)
 	if err != nil {
 		return err
 	}
@@ -65,7 +66,7 @@ func (self *service) StartAll(ctx context.Context) error {
 }
 
 func (self *service) StopStartAll(ctx context.Context) error {
-	result, err := CallIFxManagerStartAll(self.context, self.channel, true, ctx)
+	result, err := CallIFxManagerStartAll(self.context, self.cmdChannel, true, ctx)
 	if err != nil {
 		return err
 	}
@@ -73,7 +74,7 @@ func (self *service) StopStartAll(ctx context.Context) error {
 }
 
 func (self *service) Stop(ctx context.Context, name ...string) error {
-	result, err := CallIFxManagerStop(self.context, self.channel, true, ctx, name...)
+	result, err := CallIFxManagerStop(self.context, self.cmdChannel, true, ctx, name...)
 	if err != nil {
 		return err
 	}
@@ -81,7 +82,7 @@ func (self *service) Stop(ctx context.Context, name ...string) error {
 }
 
 func (self *service) Start(ctx context.Context, name ...string) error {
-	result, err := CallIFxManagerStart(self.context, self.channel, true, ctx, name...)
+	result, err := CallIFxManagerStart(self.context, self.cmdChannel, true, ctx, name...)
 	if err != nil {
 		return err
 	}
@@ -106,7 +107,7 @@ func (self *service) OnStop(ctx context.Context) error {
 	err := self.StopAll(ctx)
 	//err = multierr.Append(err, self.closeAll())
 	err = multierr.Append(err, self.shutdown())
-	close(self.channel)
+	close(self.cmdChannel)
 	self.state = IFxService.Stopped
 	return err
 }
@@ -151,8 +152,9 @@ func (self *service) goStart(data IFxManagerData) {
 			},
 		},
 		func() int {
-			return len(self.channel)
+			return len(self.cmdChannel)
 		},
+		goCommsDefinitions.CreateTryNextFunc(self.cmdChannel),
 		//func(i interface{}) {
 		//	select {
 		//	case self.channel <- i:
@@ -174,7 +176,7 @@ loop:
 					zap.Error(err))
 			}
 			break loop
-		case event, ok := <-self.channel:
+		case event, ok := <-self.cmdChannel:
 			if !ok {
 				return
 			}
@@ -185,7 +187,7 @@ loop:
 		}
 	}
 	// flush
-	for range self.channel {
+	for range self.cmdChannel {
 	}
 }
 
@@ -199,7 +201,7 @@ func NewService(
 	return &service{
 		context:           ctx,
 		cancelFunc:        cancelFunc,
-		channel:           make(chan interface{}, 32),
+		cmdChannel:        make(chan interface{}, 32),
 		onData:            onData,
 		state:             IFxService.NotInitialized,
 		logger:            logger,

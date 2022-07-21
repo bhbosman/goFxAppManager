@@ -2,6 +2,7 @@ package FxServicesSlide
 
 import (
 	"context"
+	"github.com/bhbosman/goCommsDefinitions"
 	"github.com/bhbosman/goFxAppManager/FxServicesSlide/internal"
 	"github.com/bhbosman/gocommon/ChannelHandler"
 	"github.com/bhbosman/gocommon/GoFunctionCounter"
@@ -16,7 +17,7 @@ import (
 type Service struct {
 	ctx                      context.Context
 	cancelFunc               context.CancelFunc
-	channel                  chan interface{}
+	cmdChannel               chan interface{}
 	OnData                   func() (internal.IFxManagerData, error)
 	state                    IFxService.State
 	pubSub                   *pubsub.PubSub
@@ -24,11 +25,11 @@ type Service struct {
 	connectionInstanceChange func(data internal.SendActionsForService)
 	logger                   *zap.Logger
 	goFunctionCounter        GoFunctionCounter.IService
-	pubSubChannel            chan interface{}
+	pubSubChannel            *pubsub.ChannelSubscription
 }
 
 func (self *Service) Send(message interface{}) error {
-	send, err := ISendMessage.CallISendMessageSend(self.ctx, self.channel, false, message)
+	send, err := ISendMessage.CallISendMessageSend(self.ctx, self.cmdChannel, false, message)
 	if err != nil {
 		return err
 	}
@@ -36,19 +37,19 @@ func (self *Service) Send(message interface{}) error {
 }
 
 func (self *Service) StartService(name string) {
-	_, _ = internal.CallIFxManagerSlideStartService(self.ctx, self.channel, false, name)
+	_, _ = internal.CallIFxManagerSlideStartService(self.ctx, self.cmdChannel, false, name)
 }
 
 func (self *Service) StopService(name string) {
-	_, _ = internal.CallIFxManagerSlideStopService(self.ctx, self.channel, false, name)
+	_, _ = internal.CallIFxManagerSlideStopService(self.ctx, self.cmdChannel, false, name)
 }
 
 func (self *Service) StartAllService() {
-	_, _ = internal.CallIFxManagerSlideStartAllService(self.ctx, self.channel, false)
+	_, _ = internal.CallIFxManagerSlideStartAllService(self.ctx, self.cmdChannel, false)
 }
 
 func (self *Service) StopAllService() {
-	_, _ = internal.CallIFxManagerSlideStopAllService(self.ctx, self.channel, false)
+	_, _ = internal.CallIFxManagerSlideStopAllService(self.ctx, self.cmdChannel, false)
 }
 
 func (self *Service) SetConnectionListChange(cb func(connectionList []internal.IdAndName)) {
@@ -87,9 +88,10 @@ func (self *Service) goStart(data internal.IFxManagerData) {
 		//flush
 		for range cmdChannel {
 		}
-	}(self.channel)
+	}(self.cmdChannel)
 
-	self.pubSubChannel = self.pubSub.Sub("ActiveFxServicesStatus", uiCommon.UIState)
+	self.pubSubChannel = pubsub.NewChannelSubscription(32)
+	self.pubSub.AddSub(self.pubSubChannel, "ActiveFxServicesStatus", uiCommon.UIState)
 
 	var messageReceived interface{}
 	var ok bool
@@ -127,9 +129,10 @@ func (self *Service) goStart(data internal.IFxManagerData) {
 			},
 		},
 		func() int {
-			n := len(self.pubSubChannel) + len(self.channel)
+			n := self.pubSubChannel.Count() + len(self.cmdChannel)
 			return n
 		},
+		goCommsDefinitions.CreateTryNextFunc(self.cmdChannel),
 		//func(i interface{}) {
 		//	select {
 		//	case self.channel <- i:
@@ -150,7 +153,7 @@ loop:
 					zap.Error(err))
 			}
 			break loop
-		case messageReceived, ok = <-self.channel:
+		case messageReceived, ok = <-self.cmdChannel:
 			if !ok {
 				return
 			}
@@ -159,7 +162,7 @@ loop:
 				return
 			}
 			break
-		case messageReceived, ok = <-self.pubSubChannel:
+		case messageReceived, ok = <-self.pubSubChannel.Data:
 			if !ok {
 				return
 			}
@@ -174,7 +177,7 @@ loop:
 
 func (self *Service) OnStop(ctx context.Context) error {
 	err := self.shutdown(ctx)
-	close(self.channel)
+	close(self.cmdChannel)
 	self.state = IFxService.Stopped
 	return err
 }
@@ -204,7 +207,7 @@ func NewService(
 	return &Service{
 		ctx:               ctx,
 		cancelFunc:        cancelFunc,
-		channel:           channel,
+		cmdChannel:        channel,
 		OnData:            OnData,
 		pubSub:            pubSub,
 		logger:            logger,
