@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/bhbosman/gocommon/Services/IDataShutDown"
 	"github.com/bhbosman/gocommon/Services/IFxService"
-	"github.com/bhbosman/gocommon/Services/ISendMessage"
 	"github.com/bhbosman/gocommon/messages"
+	"github.com/bhbosman/gocommon/services/ISendMessage"
 )
 
 type IFxManager interface {
