@@ -8,7 +8,6 @@ import (
 	"github.com/bhbosman/gocommon/Services/IFxService"
 	"github.com/bhbosman/gocommon/Services/ISendMessage"
 	"github.com/bhbosman/gocommon/messages"
-	"github.com/bhbosman/gocommon/model"
 	"go.uber.org/multierr"
 	"go.uber.org/zap"
 )
@@ -25,8 +24,8 @@ type service struct {
 	goFunctionCounter GoFunctionCounter.IService
 }
 
-func (self *service) Add(name string, callback messages.CreateAppCallbackFn, serviceId model.ServiceIdentifier, serviceDependency model.ServiceIdentifier) error {
-	add, err := CallIFxManagerAdd(self.context, self.cmdChannel, true, name, callback, serviceId, serviceDependency)
+func (self *service) Add(name string, callback messages.CreateAppCallbackFn) error {
+	add, err := CallIFxManagerAdd(self.context, self.cmdChannel, true, name, callback)
 	if err != nil {
 		return err
 	}

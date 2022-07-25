@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/bhbosman/gocommon/messageRouter"
 	"github.com/bhbosman/gocommon/messages"
-	"github.com/bhbosman/gocommon/model"
 	"github.com/cskr/pubsub"
 	"go.uber.org/multierr"
 	"go.uber.org/zap"
@@ -12,24 +11,18 @@ import (
 )
 
 type FxApplicationInformation struct {
-	Name              string
-	Callback          messages.CreateAppCallbackFn
-	ServiceId         model.ServiceIdentifier
-	ServiceDependency model.ServiceIdentifier
-	isDirty           bool
+	Name     string
+	Callback messages.CreateAppCallbackFn
+	isDirty  bool
 }
 
 func NewFxApplicationInformation(
-	ServiceId model.ServiceIdentifier,
-	ServiceDependency model.ServiceIdentifier,
 	name string, callback messages.CreateAppCallbackFn,
 ) *FxApplicationInformation {
 	return &FxApplicationInformation{
-		ServiceId:         ServiceId,
-		ServiceDependency: ServiceDependency,
-		isDirty:           true,
-		Name:              name,
-		Callback:          callback,
+		isDirty:  true,
+		Name:     name,
+		Callback: callback,
 	}
 }
 
@@ -43,10 +36,11 @@ type data struct {
 	logger                  *zap.Logger
 }
 
-func (self *data) Add(name string, callback messages.CreateAppCallbackFn, serviceId model.ServiceIdentifier, serviceDependency model.ServiceIdentifier) error {
+func (self *data) Add(
+	name string,
+	callback messages.CreateAppCallbackFn,
+) error {
 	self.fxCreateAppsCallbackMap[name] = NewFxApplicationInformation(
-		serviceId,
-		serviceDependency,
 		name,
 		callback)
 	self.isDirty = true
@@ -203,11 +197,10 @@ func (self *data) handleEmptyQueue(message *messages.EmptyQueue) interface{} {
 				_, active := self.fxAppsMap[information.Name]
 				self.publish(
 					&FxServiceStatus{
-						Name:              information.Name,
-						Active:            active,
-						ServiceId:         information.ServiceId,
-						ServiceDependency: information.ServiceDependency,
-					})
+						Name:   information.Name,
+						Active: active,
+					},
+				)
 				information.isDirty = false
 			}
 		}
@@ -237,8 +230,6 @@ func NewData(
 			result.Add(
 				app.Name,
 				app.Callback,
-				app.ServiceId,
-				app.ServiceDependency,
 			),
 		)
 	}

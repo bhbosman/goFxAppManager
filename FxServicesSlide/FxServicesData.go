@@ -83,10 +83,8 @@ func (self *fxServiceManagerSlideData) DoServiceListChange() {
 		for _, s := range ss {
 			if info, ok := self.ss[s]; ok {
 				idAndName := internal.IdAndName{
-					ServiceId:         info.ServiceId,
-					ServiceDependency: info.ServiceDependency,
-					Name:              info.Name,
-					Active:            info.Active,
+					Name:   info.Name,
+					Active: info.Active,
 				}
 				cbData = append(cbData, idAndName)
 			}
@@ -128,10 +126,8 @@ func (self *fxServiceManagerSlideData) SetConnectionListChange(cb func(connectio
 
 func (self *fxServiceManagerSlideData) handleFxServiceStatus(message *service.FxServiceStatus) error {
 	self.ss[message.Name] = &FxServicesManagerData{
-		Name:              message.Name,
-		Active:            message.Active,
-		ServiceId:         message.ServiceId,
-		ServiceDependency: message.ServiceDependency,
+		Name:   message.Name,
+		Active: message.Active,
 	}
 	self.isDirty[message.Name] = true
 	self.serviceListIsDirty = true

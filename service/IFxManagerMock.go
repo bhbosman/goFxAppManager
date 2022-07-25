@@ -9,7 +9,6 @@ import (
 	reflect "reflect"
 
 	messages "github.com/bhbosman/gocommon/messages"
-	model "github.com/bhbosman/gocommon/model"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -37,9 +36,9 @@ func (m *MockIFxManager) EXPECT() *MockIFxManagerMockRecorder {
 }
 
 // Add mocks base method.
-func (m *MockIFxManager) Add(arg0 string, arg1 func() (messages.IApp, context.CancelFunc, error), arg2, arg3 model.ServiceIdentifier) error {
+func (m *MockIFxManager) Add(arg0 string, arg1 func() (messages.IApp, context.CancelFunc, error)) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Add", arg0, arg1, arg2, arg3)
+	ret := m.ctrl.Call(m, "Add", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
@@ -143,7 +142,7 @@ func (mr *MockIFxManagerMockRecorder) StopAll(arg0 interface{}) *gomock.Call {
 // 1
 func (mr *MockIFxManagerMockRecorder) OnAddDoAndReturn(
 	arg0, arg1, arg2, arg3 interface{},
-	f func(arg0 string, arg1 func() (messages.IApp, context.CancelFunc, error), arg2, arg3 model.ServiceIdentifier) error) *gomock.Call {
+	f func(arg0 string, arg1 func() (messages.IApp, context.CancelFunc, error)) error) *gomock.Call {
 	return mr.
 		Add(arg0, arg1, arg2, arg3).
 		DoAndReturn(f)
@@ -152,7 +151,7 @@ func (mr *MockIFxManagerMockRecorder) OnAddDoAndReturn(
 // 1
 func (mr *MockIFxManagerMockRecorder) OnAddDo(
 	arg0, arg1, arg2, arg3 interface{},
-	f func(arg0 string, arg1 func() (messages.IApp, context.CancelFunc, error), arg2, arg3 model.ServiceIdentifier)) *gomock.Call {
+	f func(arg0 string, arg1 func() (messages.IApp, context.CancelFunc, error))) *gomock.Call {
 	return mr.
 		Add(arg0, arg1, arg2, arg3).
 		Do(f)
@@ -160,7 +159,7 @@ func (mr *MockIFxManagerMockRecorder) OnAddDo(
 
 // 1
 func (mr *MockIFxManagerMockRecorder) OnAddDoAndReturnDefault(
-	f func(arg0 string, arg1 func() (messages.IApp, context.CancelFunc, error), arg2, arg3 model.ServiceIdentifier) error) *gomock.Call {
+	f func(arg0 string, arg1 func() (messages.IApp, context.CancelFunc, error)) error) *gomock.Call {
 	return mr.
 		Add(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 		DoAndReturn(f)
@@ -168,7 +167,7 @@ func (mr *MockIFxManagerMockRecorder) OnAddDoAndReturnDefault(
 
 // 1
 func (mr *MockIFxManagerMockRecorder) OnAddDoDefault(
-	f func(arg0 string, arg1 func() (messages.IApp, context.CancelFunc, error), arg2, arg3 model.ServiceIdentifier)) *gomock.Call {
+	f func(arg0 string, arg1 func() (messages.IApp, context.CancelFunc, error))) *gomock.Call {
 	return mr.
 		Add(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 		Do(f)

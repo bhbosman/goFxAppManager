@@ -10,7 +10,6 @@ import (
 
 	errors "github.com/bhbosman/gocommon/errors"
 	messages "github.com/bhbosman/gocommon/messages"
-	model "github.com/bhbosman/gocommon/model"
 )
 
 // Interface A Comment
@@ -20,8 +19,6 @@ import (
 type IFxManagerAddIn struct {
 	arg0 string
 	arg1 func() (messages.IApp, context.CancelFunc, error)
-	arg2 model.ServiceIdentifier
-	arg3 model.ServiceIdentifier
 }
 
 type IFxManagerAddOut struct {
@@ -42,7 +39,7 @@ type IFxManagerAdd struct {
 	outDataChannel chan IFxManagerAddOut
 }
 
-func NewIFxManagerAdd(waitToComplete bool, arg0 string, arg1 func() (messages.IApp, context.CancelFunc, error), arg2, arg3 model.ServiceIdentifier) *IFxManagerAdd {
+func NewIFxManagerAdd(waitToComplete bool, arg0 string, arg1 func() (messages.IApp, context.CancelFunc, error)) *IFxManagerAdd {
 	var outDataChannel chan IFxManagerAddOut
 	if waitToComplete {
 		outDataChannel = make(chan IFxManagerAddOut)
@@ -53,8 +50,6 @@ func NewIFxManagerAdd(waitToComplete bool, arg0 string, arg1 func() (messages.IA
 		inData: IFxManagerAddIn{
 			arg0: arg0,
 			arg1: arg1,
-			arg2: arg2,
-			arg3: arg3,
 		},
 		outDataChannel: outDataChannel,
 	}
@@ -82,11 +77,11 @@ func (self *IFxManagerAdd) Close() error {
 	close(self.outDataChannel)
 	return nil
 }
-func CallIFxManagerAdd(context context.Context, channel chan<- interface{}, waitToComplete bool, arg0 string, arg1 func() (messages.IApp, context.CancelFunc, error), arg2, arg3 model.ServiceIdentifier) (IFxManagerAddOut, error) {
+func CallIFxManagerAdd(context context.Context, channel chan<- interface{}, waitToComplete bool, arg0 string, arg1 func() (messages.IApp, context.CancelFunc, error)) (IFxManagerAddOut, error) {
 	if context != nil && context.Err() != nil {
 		return IFxManagerAddOut{}, context.Err()
 	}
-	data := NewIFxManagerAdd(waitToComplete, arg0, arg1, arg2, arg3)
+	data := NewIFxManagerAdd(waitToComplete, arg0, arg1)
 	if waitToComplete {
 		defer func(data *IFxManagerAdd) {
 			err := data.Close()
@@ -576,7 +571,7 @@ func ChannelEventsForIFxManager(next IFxManager, event interface{}) (bool, error
 	switch v := event.(type) {
 	case *IFxManagerAdd:
 		data := IFxManagerAddOut{}
-		data.Args0 = next.Add(v.inData.arg0, v.inData.arg1, v.inData.arg2, v.inData.arg3)
+		data.Args0 = next.Add(v.inData.arg0, v.inData.arg1)
 		if v.outDataChannel != nil {
 			v.outDataChannel <- data
 		}

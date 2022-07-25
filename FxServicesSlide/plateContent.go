@@ -58,7 +58,7 @@ func (self *PlateContent) GetCell(row, column int) *tview.TableCell {
 				SetSelectable(false).
 				SetAlign(tview.AlignRight)
 		default:
-			return tview.NewTableCell(fmt.Sprintf("%08X", self.Grid[row-1].ServiceId)).
+			return tview.NewTableCell(fmt.Sprintf("%08X", 0)).
 				SetAlign(tview.AlignRight)
 		}
 	case 4:
@@ -69,7 +69,7 @@ func (self *PlateContent) GetCell(row, column int) *tview.TableCell {
 				SetSelectable(false).
 				SetAlign(tview.AlignRight)
 		default:
-			return tview.NewTableCell(fmt.Sprintf("%08X", self.Grid[row-1].ServiceDependency)).
+			return tview.NewTableCell(fmt.Sprintf("%08X", 0)).
 				SetAlign(tview.AlignRight)
 		}
 	}

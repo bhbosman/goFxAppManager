@@ -6,15 +6,12 @@ import (
 	"github.com/bhbosman/gocommon/Services/IFxService"
 	"github.com/bhbosman/gocommon/Services/ISendMessage"
 	"github.com/bhbosman/gocommon/messages"
-	"github.com/bhbosman/gocommon/model"
 )
 
 type IFxManager interface {
 	ISendMessage.ISendMessage
 	Add(name string,
 		callback messages.CreateAppCallbackFn,
-		serviceId model.ServiceIdentifier,
-		serviceDependency model.ServiceIdentifier,
 	) error
 	StopAll(ctx context.Context) error
 	StartAll(ctx context.Context) error
