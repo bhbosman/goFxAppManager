@@ -171,10 +171,7 @@ func (self *data) Send(message interface{}) error {
 		)
 		return self.appContext.Err()
 	}
-	b, _ := self.messageRouter.Route(message)
-	if !b {
-		self.logger.Info("No message handler implemented for", zap.String("TypeName", reflect.TypeOf(message).String()))
-	}
+	self.messageRouter.Route(message)
 	return nil
 }
 

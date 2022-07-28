@@ -42,8 +42,8 @@ func (self *fxServiceManagerSlideData) StopService(name string) {
 }
 
 func (self *fxServiceManagerSlideData) Send(data interface{}) error {
-	_, err := self.messageRouter.Route(data)
-	return err
+	self.messageRouter.Route(data)
+	return nil
 }
 func (self *fxServiceManagerSlideData) handleUiStarted(message *uiCommon.UiStarted) {
 	self.UiActive = message.Active
