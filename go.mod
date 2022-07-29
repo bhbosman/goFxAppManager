@@ -3,9 +3,9 @@ module github.com/bhbosman/goFxAppManager
 go 1.18
 
 require (
-	github.com/bhbosman/goCommsDefinitions v0.0.0-20220721070505-30206872567f
-	github.com/bhbosman/goUi v0.0.0-20220625174028-03193a90ee79
-	github.com/bhbosman/gocommon v0.0.0-20220718213201-2711fee77ae4
+	github.com/bhbosman/goCommsDefinitions v0.0.0-20220724214237-63eea03e3695
+	github.com/bhbosman/goUi v0.0.0-20220725200743-ddc6ed05f1d6
+	github.com/bhbosman/gocommon v0.0.0-20220725200742-9cdc334065f3
 	github.com/cskr/pubsub v1.0.2
 	github.com/gdamore/tcell/v2 v2.5.1
 	github.com/golang/mock v1.6.0
@@ -21,7 +21,6 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
 	github.com/gdamore/encoding v1.0.0 // indirect
-	github.com/icza/gox v0.0.0-20220321141217-e2d488ab2fbc // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
