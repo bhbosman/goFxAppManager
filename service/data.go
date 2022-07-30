@@ -17,7 +17,8 @@ type FxApplicationInformation struct {
 }
 
 func NewFxApplicationInformation(
-	name string, callback messages.CreateAppCallbackFn,
+	name string,
+	callback messages.CreateAppCallbackFn,
 ) *FxApplicationInformation {
 	return &FxApplicationInformation{
 		isDirty:  true,
