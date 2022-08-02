@@ -25,7 +25,7 @@ type Service struct {
 	connectionInstanceChange func(data internal.SendActionsForService)
 	logger                   *zap.Logger
 	goFunctionCounter        GoFunctionCounter.IService
-	pubSubChannel            *pubsub.ChannelSubscription
+	pubSubChannel            *pubsub.NextFuncSubscription
 }
 
 func (self *Service) Send(message interface{}) error {
@@ -90,7 +90,7 @@ func (self *Service) goStart(data internal.IFxManagerData) {
 		}
 	}(self.cmdChannel)
 
-	self.pubSubChannel = pubsub.NewChannelSubscription(32)
+	self.pubSubChannel = pubsub.NewNextFuncSubscription(goCommsDefinitions.CreateNextFunc(self.cmdChannel))
 	self.pubSub.AddSub(self.pubSubChannel, "ActiveFxServicesStatus", uiCommon.UIState)
 
 	var messageReceived interface{}
@@ -154,15 +154,6 @@ loop:
 			}
 			break loop
 		case messageReceived, ok = <-self.cmdChannel:
-			if !ok {
-				return
-			}
-			b, err := channelHandlerCallback(messageReceived)
-			if err != nil || b {
-				return
-			}
-			break
-		case messageReceived, ok = <-self.pubSubChannel.Data:
 			if !ok {
 				return
 			}
