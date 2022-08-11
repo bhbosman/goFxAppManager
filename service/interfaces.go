@@ -10,9 +10,7 @@ import (
 
 type IFxManager interface {
 	ISendMessage.ISendMessage
-	Add(name string,
-		callback messages.CreateAppCallbackFn,
-	) error
+	Add(name string, callback messages.CreateAppCallbackFn) error
 	StopAll(ctx context.Context) error
 	StartAll(ctx context.Context) error
 	Stop(ctx context.Context, name ...string) error
