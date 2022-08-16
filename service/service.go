@@ -24,6 +24,14 @@ type service struct {
 	goFunctionCounter GoFunctionCounter.IService
 }
 
+func (self *service) GetState() (started []string, err error) {
+	state, err := CallIFxManagerGetState(self.context, self.cmdChannel, true)
+	if err != nil {
+		return nil, err
+	}
+	return state.Args0, state.Args1
+}
+
 func (self *service) Add(name string, callback messages.CreateAppCallbackFn) error {
 	add, err := CallIFxManagerAdd(self.context, self.cmdChannel, true, name, callback)
 	if err != nil {
@@ -90,11 +98,6 @@ func (self *service) Start(ctx context.Context, name ...string) error {
 
 func (self *service) OnStart(ctx context.Context) error {
 	err := self.start()
-	if err != nil {
-		return err
-	}
-
-	err = self.StartAll(ctx)
 	if err != nil {
 		return err
 	}
@@ -190,7 +193,7 @@ loop:
 	}
 }
 
-func NewService(
+func newService(
 	applicationContext context.Context,
 	onData OnDataCallback,
 	logger *zap.Logger,

@@ -44,9 +44,24 @@ func (m *MockIFxManager) Add(arg0 string, arg1 func() (messages.IApp, context.Ca
 }
 
 // Add indicates an expected call of Add.
-func (mr *MockIFxManagerMockRecorder) Add(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+func (mr *MockIFxManagerMockRecorder) Add(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Add", reflect.TypeOf((*MockIFxManager)(nil).Add), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Add", reflect.TypeOf((*MockIFxManager)(nil).Add), arg0, arg1)
+}
+
+// GetState mocks base method.
+func (m *MockIFxManager) GetState() ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetState")
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetState indicates an expected call of GetState.
+func (mr *MockIFxManagerMockRecorder) GetState() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetState", reflect.TypeOf((*MockIFxManager)(nil).GetState))
 }
 
 // Send mocks base method.
@@ -129,31 +144,31 @@ func (mr *MockIFxManagerMockRecorder) StopAll(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StopAll", reflect.TypeOf((*MockIFxManager)(nil).StopAll), arg0)
 }
 
-// argNames: [arg0 arg1 arg2 arg3]
-// defaultArgs: [gomock.Any() gomock.Any() gomock.Any() gomock.Any()]
-// defaultArgsAsString: gomock.Any(),gomock.Any(),gomock.Any(),gomock.Any()
-// argTypes: [string func() (messages.IApp, context.CancelFunc, error) model.ServiceIdentifier model.ServiceIdentifier]
-// argString: arg0 string, arg1 func() (messages.IApp, context.CancelFunc, error), arg2, arg3 model.ServiceIdentifier
+// argNames: [arg0 arg1]
+// defaultArgs: [gomock.Any() gomock.Any()]
+// defaultArgsAsString: gomock.Any(),gomock.Any()
+// argTypes: [string func() (messages.IApp, context.CancelFunc, error)]
+// argString: arg0 string, arg1 func() (messages.IApp, context.CancelFunc, error)
 // rets: [error]
 // retString: error
 // retString:  error
-// ia: map[arg0:{} arg1:{} arg2:{} arg3:{}]
+// ia: map[arg0:{} arg1:{}]
 // idRecv: mr
 // 1
 func (mr *MockIFxManagerMockRecorder) OnAddDoAndReturn(
-	arg0, arg1, arg2, arg3 interface{},
+	arg0, arg1 interface{},
 	f func(arg0 string, arg1 func() (messages.IApp, context.CancelFunc, error)) error) *gomock.Call {
 	return mr.
-		Add(arg0, arg1, arg2, arg3).
+		Add(arg0, arg1).
 		DoAndReturn(f)
 }
 
 // 1
 func (mr *MockIFxManagerMockRecorder) OnAddDo(
-	arg0, arg1, arg2, arg3 interface{},
+	arg0, arg1 interface{},
 	f func(arg0 string, arg1 func() (messages.IApp, context.CancelFunc, error))) *gomock.Call {
 	return mr.
-		Add(arg0, arg1, arg2, arg3).
+		Add(arg0, arg1).
 		Do(f)
 }
 
@@ -161,7 +176,7 @@ func (mr *MockIFxManagerMockRecorder) OnAddDo(
 func (mr *MockIFxManagerMockRecorder) OnAddDoAndReturnDefault(
 	f func(arg0 string, arg1 func() (messages.IApp, context.CancelFunc, error)) error) *gomock.Call {
 	return mr.
-		Add(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+		Add(gomock.Any(), gomock.Any()).
 		DoAndReturn(f)
 }
 
@@ -169,7 +184,7 @@ func (mr *MockIFxManagerMockRecorder) OnAddDoAndReturnDefault(
 func (mr *MockIFxManagerMockRecorder) OnAddDoDefault(
 	f func(arg0 string, arg1 func() (messages.IApp, context.CancelFunc, error))) *gomock.Call {
 	return mr.
-		Add(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+		Add(gomock.Any(), gomock.Any()).
 		Do(f)
 }
 
@@ -178,10 +193,10 @@ func (mr *MockIFxManagerMockRecorder) OnAddDoDefault(
 // retArgs22: ret0 error
 // 1
 func (mr *MockIFxManagerMockRecorder) OnAddReturn(
-	arg0, arg1, arg2, arg3 interface{},
+	arg0, arg1 interface{},
 	ret0 error) *gomock.Call {
 	return mr.
-		Add(arg0, arg1, arg2, arg3).
+		Add(arg0, arg1).
 		Return(ret0)
 }
 
@@ -189,8 +204,44 @@ func (mr *MockIFxManagerMockRecorder) OnAddReturn(
 func (mr *MockIFxManagerMockRecorder) OnAddReturnDefault(
 	ret0 error) *gomock.Call {
 	return mr.
-		Add(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+		Add(gomock.Any(), gomock.Any()).
 		Return(ret0)
+}
+
+// argNames: []
+// defaultArgs: []
+// defaultArgsAsString:
+// argTypes: []
+// argString:
+// rets: [[]string error]
+// retString: []string, error
+// retString:  ([]string, error)
+// ia: map[]
+// idRecv: mr
+// 0
+func (mr *MockIFxManagerMockRecorder) OnGetStateDoAndReturn(
+	f func() ([]string, error)) *gomock.Call {
+	return mr.
+		GetState().
+		DoAndReturn(f)
+}
+
+// 0
+func (mr *MockIFxManagerMockRecorder) OnGetStateDo(
+	f func()) *gomock.Call {
+	return mr.
+		GetState().
+		DoAndReturn(f)
+}
+
+// retNames: [ret0 ret1]
+// retArgs: [ret0 []string ret1 error]
+// retArgs22: ret0 []string,ret1 error
+// 1
+func (mr *MockIFxManagerMockRecorder) OnGetStateReturn(ret0 []string, ret1 error) *gomock.Call {
+	return mr.
+		GetState().
+		Return(ret0, ret1)
 }
 
 // argNames: [arg0]

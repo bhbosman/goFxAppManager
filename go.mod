@@ -3,7 +3,7 @@ module github.com/bhbosman/goFxAppManager
 go 1.18
 
 require (
-	github.com/bhbosman/goCommsDefinitions v0.0.0-20220724214237-63eea03e3695
+	github.com/bhbosman/goCommsDefinitions v0.0.0-20220801175552-c5aa68065af3
 	github.com/bhbosman/goUi v0.0.0-20220725200743-ddc6ed05f1d6
 	github.com/bhbosman/gocommon v0.0.0-20220725200742-9cdc334065f3
 	github.com/cskr/pubsub v1.0.2
@@ -41,8 +41,6 @@ require (
 replace github.com/golang/mock => github.com/bhbosman/gomock v1.6.1-0.20220617134815-f277ff266f47
 
 replace github.com/bhbosman/goUi => ../goUi
-
-replace github.com/bhbosman/goConnectionManager => ../goConnectionManager
 
 replace github.com/bhbosman/gocommon => ../gocommon
 

@@ -108,6 +108,95 @@ func CallIFxManagerAdd(context context.Context, channel chan<- interface{}, wait
 	return v, nil
 }
 
+// Interface IFxManager, Method: GetState
+type IFxManagerGetStateIn struct {
+}
+
+type IFxManagerGetStateOut struct {
+	Args0 []string
+	Args1 error
+}
+type IFxManagerGetStateError struct {
+	InterfaceName string
+	MethodName    string
+	Reason        string
+}
+
+func (self *IFxManagerGetStateError) Error() string {
+	return fmt.Sprintf("error in data coming back from %v::%v. Reason: %v", self.InterfaceName, self.MethodName, self.Reason)
+}
+
+type IFxManagerGetState struct {
+	inData         IFxManagerGetStateIn
+	outDataChannel chan IFxManagerGetStateOut
+}
+
+func NewIFxManagerGetState(waitToComplete bool) *IFxManagerGetState {
+	var outDataChannel chan IFxManagerGetStateOut
+	if waitToComplete {
+		outDataChannel = make(chan IFxManagerGetStateOut)
+	} else {
+		outDataChannel = nil
+	}
+	return &IFxManagerGetState{
+		inData:         IFxManagerGetStateIn{},
+		outDataChannel: outDataChannel,
+	}
+}
+
+func (self *IFxManagerGetState) Wait(onError func(interfaceName string, methodName string, err error) error) (IFxManagerGetStateOut, error) {
+	data, ok := <-self.outDataChannel
+	if !ok {
+		generatedError := &IFxManagerGetStateError{
+			InterfaceName: "IFxManager",
+			MethodName:    "GetState",
+			Reason:        "Channel for IFxManager::GetState returned false",
+		}
+		if onError != nil {
+			err := onError("IFxManager", "GetState", generatedError)
+			return IFxManagerGetStateOut{}, err
+		} else {
+			return IFxManagerGetStateOut{}, generatedError
+		}
+	}
+	return data, nil
+}
+
+func (self *IFxManagerGetState) Close() error {
+	close(self.outDataChannel)
+	return nil
+}
+func CallIFxManagerGetState(context context.Context, channel chan<- interface{}, waitToComplete bool) (IFxManagerGetStateOut, error) {
+	if context != nil && context.Err() != nil {
+		return IFxManagerGetStateOut{}, context.Err()
+	}
+	data := NewIFxManagerGetState(waitToComplete)
+	if waitToComplete {
+		defer func(data *IFxManagerGetState) {
+			err := data.Close()
+			if err != nil {
+			}
+		}(data)
+	}
+	if context != nil && context.Err() != nil {
+		return IFxManagerGetStateOut{}, context.Err()
+	}
+	channel <- data
+	var err error
+	var v IFxManagerGetStateOut
+	if waitToComplete {
+		v, err = data.Wait(func(interfaceName string, methodName string, err error) error {
+			return err
+		})
+	} else {
+		err = errors.NoWaitOperationError
+	}
+	if err != nil {
+		return IFxManagerGetStateOut{}, err
+	}
+	return v, nil
+}
+
 // Interface IFxManager, Method: Send
 type IFxManagerSendIn struct {
 	arg0 interface{}
@@ -572,6 +661,13 @@ func ChannelEventsForIFxManager(next IFxManager, event interface{}) (bool, error
 	case *IFxManagerAdd:
 		data := IFxManagerAddOut{}
 		data.Args0 = next.Add(v.inData.arg0, v.inData.arg1)
+		if v.outDataChannel != nil {
+			v.outDataChannel <- data
+		}
+		return true, nil
+	case *IFxManagerGetState:
+		data := IFxManagerGetStateOut{}
+		data.Args0, data.Args1 = next.GetState()
 		if v.outDataChannel != nil {
 			v.outDataChannel <- data
 		}

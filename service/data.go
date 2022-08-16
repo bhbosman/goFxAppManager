@@ -37,6 +37,22 @@ type data struct {
 	logger                  *zap.Logger
 }
 
+func (self *data) GetState() (started []string, err error) {
+	result := make([]string, 0, len(self.fxAppsMap))
+	for key := range self.fxAppsMap {
+		result = append(result, key)
+	}
+	return result, nil
+}
+
+func (self *data) SaveToConfiguration(ctx context.Context) error {
+	return nil
+}
+
+func (self *data) StartFromConfiguration(ctx context.Context) error {
+	return nil
+}
+
 func (self *data) Add(
 	name string,
 	callback messages.CreateAppCallbackFn,
@@ -160,7 +176,7 @@ func (self *data) Start(startContext context.Context, name ...string) error {
 }
 
 func (self *data) ShutDown() error {
-	return self.StopAll(context.Background())
+	return nil
 }
 
 func (self *data) Send(message interface{}) error {
@@ -207,7 +223,7 @@ func (self *data) handleEmptyQueue(message *messages.EmptyQueue) interface{} {
 	return nil
 }
 
-func NewData(
+func newData(
 	applicationContext context.Context,
 	FnApps []messages.CreateAppCallback,
 	pubSub *pubsub.PubSub,
