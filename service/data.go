@@ -38,6 +38,7 @@ type data struct {
 }
 
 func (self *data) Publish() error {
+	self.isDirty = true
 	return nil
 }
 
