@@ -197,6 +197,94 @@ func CallIFxManagerGetState(context context.Context, channel chan<- interface{},
 	return v, nil
 }
 
+// Interface IFxManager, Method: Publish
+type IFxManagerPublishIn struct {
+}
+
+type IFxManagerPublishOut struct {
+	Args0 error
+}
+type IFxManagerPublishError struct {
+	InterfaceName string
+	MethodName    string
+	Reason        string
+}
+
+func (self *IFxManagerPublishError) Error() string {
+	return fmt.Sprintf("error in data coming back from %v::%v. Reason: %v", self.InterfaceName, self.MethodName, self.Reason)
+}
+
+type IFxManagerPublish struct {
+	inData         IFxManagerPublishIn
+	outDataChannel chan IFxManagerPublishOut
+}
+
+func NewIFxManagerPublish(waitToComplete bool) *IFxManagerPublish {
+	var outDataChannel chan IFxManagerPublishOut
+	if waitToComplete {
+		outDataChannel = make(chan IFxManagerPublishOut)
+	} else {
+		outDataChannel = nil
+	}
+	return &IFxManagerPublish{
+		inData:         IFxManagerPublishIn{},
+		outDataChannel: outDataChannel,
+	}
+}
+
+func (self *IFxManagerPublish) Wait(onError func(interfaceName string, methodName string, err error) error) (IFxManagerPublishOut, error) {
+	data, ok := <-self.outDataChannel
+	if !ok {
+		generatedError := &IFxManagerPublishError{
+			InterfaceName: "IFxManager",
+			MethodName:    "Publish",
+			Reason:        "Channel for IFxManager::Publish returned false",
+		}
+		if onError != nil {
+			err := onError("IFxManager", "Publish", generatedError)
+			return IFxManagerPublishOut{}, err
+		} else {
+			return IFxManagerPublishOut{}, generatedError
+		}
+	}
+	return data, nil
+}
+
+func (self *IFxManagerPublish) Close() error {
+	close(self.outDataChannel)
+	return nil
+}
+func CallIFxManagerPublish(context context.Context, channel chan<- interface{}, waitToComplete bool) (IFxManagerPublishOut, error) {
+	if context != nil && context.Err() != nil {
+		return IFxManagerPublishOut{}, context.Err()
+	}
+	data := NewIFxManagerPublish(waitToComplete)
+	if waitToComplete {
+		defer func(data *IFxManagerPublish) {
+			err := data.Close()
+			if err != nil {
+			}
+		}(data)
+	}
+	if context != nil && context.Err() != nil {
+		return IFxManagerPublishOut{}, context.Err()
+	}
+	channel <- data
+	var err error
+	var v IFxManagerPublishOut
+	if waitToComplete {
+		v, err = data.Wait(func(interfaceName string, methodName string, err error) error {
+			return err
+		})
+	} else {
+		err = errors.NoWaitOperationError
+	}
+	if err != nil {
+		return IFxManagerPublishOut{}, err
+	}
+	return v, nil
+}
+
 // Interface IFxManager, Method: Send
 type IFxManagerSendIn struct {
 	arg0 interface{}
@@ -668,6 +756,13 @@ func ChannelEventsForIFxManager(next IFxManager, event interface{}) (bool, error
 	case *IFxManagerGetState:
 		data := IFxManagerGetStateOut{}
 		data.Args0, data.Args1 = next.GetState()
+		if v.outDataChannel != nil {
+			v.outDataChannel <- data
+		}
+		return true, nil
+	case *IFxManagerPublish:
+		data := IFxManagerPublishOut{}
+		data.Args0 = next.Publish()
 		if v.outDataChannel != nil {
 			v.outDataChannel <- data
 		}

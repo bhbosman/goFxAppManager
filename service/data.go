@@ -37,6 +37,10 @@ type data struct {
 	logger                  *zap.Logger
 }
 
+func (self *data) Publish() error {
+	return nil
+}
+
 func (self *data) GetState() (started []string, err error) {
 	result := make([]string, 0, len(self.fxAppsMap))
 	for key := range self.fxAppsMap {

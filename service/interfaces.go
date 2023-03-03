@@ -16,6 +16,7 @@ type IFxManager interface {
 	Stop(ctx context.Context, name ...string) error
 	Start(ctx context.Context, name ...string) error
 	GetState() (started []string, err error)
+	Publish() error
 }
 
 type IFxManagerService interface {

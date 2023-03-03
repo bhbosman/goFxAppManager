@@ -64,6 +64,20 @@ func (mr *MockIFxManagerMockRecorder) GetState() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetState", reflect.TypeOf((*MockIFxManager)(nil).GetState))
 }
 
+// Publish mocks base method.
+func (m *MockIFxManager) Publish() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Publish")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Publish indicates an expected call of Publish.
+func (mr *MockIFxManagerMockRecorder) Publish() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Publish", reflect.TypeOf((*MockIFxManager)(nil).Publish))
+}
+
 // Send mocks base method.
 func (m *MockIFxManager) Send(arg0 interface{}) error {
 	m.ctrl.T.Helper()
@@ -242,6 +256,42 @@ func (mr *MockIFxManagerMockRecorder) OnGetStateReturn(ret0 []string, ret1 error
 	return mr.
 		GetState().
 		Return(ret0, ret1)
+}
+
+// argNames: []
+// defaultArgs: []
+// defaultArgsAsString:
+// argTypes: []
+// argString:
+// rets: [error]
+// retString: error
+// retString:  error
+// ia: map[]
+// idRecv: mr
+// 0
+func (mr *MockIFxManagerMockRecorder) OnPublishDoAndReturn(
+	f func() error) *gomock.Call {
+	return mr.
+		Publish().
+		DoAndReturn(f)
+}
+
+// 0
+func (mr *MockIFxManagerMockRecorder) OnPublishDo(
+	f func()) *gomock.Call {
+	return mr.
+		Publish().
+		DoAndReturn(f)
+}
+
+// retNames: [ret0]
+// retArgs: [ret0 error]
+// retArgs22: ret0 error
+// 1
+func (mr *MockIFxManagerMockRecorder) OnPublishReturn(ret0 error) *gomock.Call {
+	return mr.
+		Publish().
+		Return(ret0)
 }
 
 // argNames: [arg0]

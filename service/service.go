@@ -24,6 +24,10 @@ type service struct {
 	goFunctionCounter GoFunctionCounter.IService
 }
 
+func (self *service) Publish() error {
+	return nil
+}
+
 func (self *service) GetState() (started []string, err error) {
 	state, err := CallIFxManagerGetState(self.context, self.cmdChannel, true)
 	if err != nil {

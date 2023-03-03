@@ -110,6 +110,8 @@ func ProvideFxManager() fx.Option {
 	return fx.Options(
 		fx.Provide(
 			fx.Annotated{
+				Name:  "",
+				Group: "",
 				Target: func(
 					params struct {
 						fx.In
