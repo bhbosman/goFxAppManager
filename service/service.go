@@ -25,7 +25,11 @@ type service struct {
 }
 
 func (self *service) Publish() error {
-	return nil
+	ans, err := CallIFxManagerPublish(self.context, self.cmdChannel, false)
+	if err != nil {
+		return nil
+	}
+	return ans.Args0
 }
 
 func (self *service) GetState() (started []string, err error) {
@@ -202,7 +206,7 @@ func newService(
 	onData OnDataCallback,
 	logger *zap.Logger,
 	goFunctionCounter GoFunctionCounter.IService,
-) (*service, error) {
+) (IFxManagerService, error) {
 	ctx, cancelFunc := context.WithCancel(applicationContext)
 	return &service{
 		context:           ctx,

@@ -38,6 +38,7 @@ func ProvideServiceSlide() fx.Option {
 						Lifecycle          fx.Lifecycle
 						Logger             *zap.Logger
 						GoFunctionCounter  GoFunctionCounter.IService
+						FxManagerService   service.IFxManagerService
 						OnData             func() (internal.IFxManagerData, error)
 					},
 				) (internal.IFxManagerService, error) {
@@ -47,6 +48,7 @@ func ProvideServiceSlide() fx.Option {
 						params.PubSub,
 						params.Logger,
 						params.GoFunctionCounter,
+						params.FxManagerService,
 					)
 					if err != nil {
 						return nil, err

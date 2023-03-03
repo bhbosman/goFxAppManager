@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/bhbosman/goCommsDefinitions"
 	"github.com/bhbosman/goFxAppManager/FxServicesSlide/internal"
+	"github.com/bhbosman/goFxAppManager/service"
 	"github.com/bhbosman/gocommon/ChannelHandler"
 	"github.com/bhbosman/gocommon/GoFunctionCounter"
 	"github.com/bhbosman/gocommon/Services/IFxService"
@@ -26,6 +27,7 @@ type Service struct {
 	logger                   *zap.Logger
 	goFunctionCounter        GoFunctionCounter.IService
 	pubSubChannel            *pubsub.NextFuncSubscription
+	fxManagerService         service.IFxManagerService
 }
 
 func (self *Service) Send(message interface{}) error {
@@ -92,7 +94,7 @@ func (self *Service) goStart(data internal.IFxManagerData) {
 
 	self.pubSubChannel = pubsub.NewNextFuncSubscription(goCommsDefinitions.CreateNextFunc(self.cmdChannel))
 	self.pubSub.AddSub(self.pubSubChannel, "ActiveFxServicesStatus", uiCommon.UIState)
-
+	self.fxManagerService.Publish()
 	var messageReceived interface{}
 	var ok bool
 
@@ -192,6 +194,7 @@ func NewService(
 	pubSub *pubsub.PubSub,
 	logger *zap.Logger,
 	goFunctionCounter GoFunctionCounter.IService,
+	fxManagerService service.IFxManagerService,
 ) (internal.IFxManagerService, error) {
 	ctx, cancelFunc := context.WithCancel(applicationContext)
 	channel := make(chan interface{}, 32)
@@ -203,5 +206,6 @@ func NewService(
 		pubSub:            pubSub,
 		logger:            logger,
 		goFunctionCounter: goFunctionCounter,
+		fxManagerService:  fxManagerService,
 	}, nil
 }
