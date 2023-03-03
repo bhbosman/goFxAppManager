@@ -3,9 +3,9 @@ module github.com/bhbosman/goFxAppManager
 go 1.18
 
 require (
-	github.com/bhbosman/goCommsDefinitions v0.0.0-20220801175552-c5aa68065af3
-	github.com/bhbosman/goUi v0.0.0-20220725200743-ddc6ed05f1d6
-	github.com/bhbosman/gocommon v0.0.0-20220725200742-9cdc334065f3
+	github.com/bhbosman/goCommsDefinitions v0.0.0-20230302063431-887458f90947
+	github.com/bhbosman/goUi v0.0.0-20230302065227-24c3cb06165e
+	github.com/bhbosman/gocommon v0.0.0-20230303055326-d59d6b655a59
 	github.com/cskr/pubsub v1.0.2
 	github.com/gdamore/tcell/v2 v2.5.1
 	github.com/golang/mock v1.6.0
