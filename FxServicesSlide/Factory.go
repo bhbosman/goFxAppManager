@@ -29,7 +29,7 @@ func (self *Factory) Title() string {
 	return "FxServices"
 }
 
-func (self *Factory) Content(nextSlide func()) (string, ui.IPrimitiveCloser, error) {
+func (self *Factory) Content() (string, ui.IPrimitiveCloser, error) {
 	slide := NewFxServiceSlide(
 		self.service,
 		self.app,

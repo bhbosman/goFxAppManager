@@ -3,7 +3,7 @@ module github.com/bhbosman/goFxAppManager
 go 1.18
 
 require (
-	github.com/bhbosman/goCommsDefinitions v0.0.0-20230302063431-887458f90947
+	github.com/bhbosman/goCommsDefinitions v0.0.0-20230308211643-24fe88b2378e
 	github.com/bhbosman/goUi v0.0.0-20230302065227-24c3cb06165e
 	github.com/bhbosman/gocommon v0.0.0-20230303055326-d59d6b655a59
 	github.com/cskr/pubsub v1.0.2
@@ -17,7 +17,7 @@ require (
 
 require (
 	github.com/bhbosman/goerrors v0.0.0-20220623084908-4d7bbcd178cf // indirect
-	github.com/cenkalti/backoff/v4 v4.0.0 // indirect
+	github.com/cenkalti/backoff/v4 v4.1.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
 	github.com/gdamore/encoding v1.0.0 // indirect
@@ -39,6 +39,7 @@ require (
 )
 
 replace github.com/golang/mock => ../gomock
+
 replace github.com/bhbosman/goUi => ../goUi
 
 replace github.com/bhbosman/gocommon => ../gocommon
