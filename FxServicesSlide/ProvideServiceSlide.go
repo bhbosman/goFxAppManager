@@ -75,11 +75,14 @@ func ProvideServiceSlide() fx.Option {
 						App     *tview.Application
 						Service internal.IFxManagerService
 					},
-				) (ui.ISlideFactory, error) {
-					return NewFactory(
-						params.App,
+				) (ui.IPrimitiveCloser, error) {
+					slide := NewFxServiceSlide(
+						200,
+						"FxServices",
 						params.Service,
+						params.App,
 					)
+					return slide, nil
 				},
 			},
 		),

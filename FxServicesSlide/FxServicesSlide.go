@@ -8,13 +8,23 @@ import (
 )
 
 type FxServicesManagerSlide struct {
-	service    internal.IFxManagerService
-	table      *tview.Table
-	actionList *tview.List
-	next       tview.Primitive
-	app        *tview.Application
-	plate      *PlateContent
-	toggle     bool
+	slideOrderNumber int
+	service          internal.IFxManagerService
+	table            *tview.Table
+	actionList       *tview.List
+	next             tview.Primitive
+	app              *tview.Application
+	plate            *PlateContent
+	toggle           bool
+	slideName        string
+}
+
+func (self *FxServicesManagerSlide) OrderNumber() int {
+	return self.slideOrderNumber
+}
+
+func (self *FxServicesManagerSlide) Name() string {
+	return self.slideName
 }
 
 func (self *FxServicesManagerSlide) Toggle(b bool) {
@@ -176,13 +186,17 @@ func (self *FxServicesManagerSlide) init() {
 }
 
 func NewFxServiceSlide(
+	slideOrderNumber int,
+	slideName string,
 	service internal.IFxManagerService,
 	app *tview.Application,
 ) ui.IPrimitiveCloser {
 
 	result := &FxServicesManagerSlide{
-		service: service,
-		app:     app,
+		slideOrderNumber: slideOrderNumber,
+		slideName:        slideName,
+		service:          service,
+		app:              app,
 	}
 	result.init()
 	service.SetConnectionListChange(result.SetFxServiceListChange)
