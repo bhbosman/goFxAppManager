@@ -14,7 +14,7 @@ type fxServiceManagerSlideData struct {
 	serviceListIsDirty         bool
 	ss                         map[string]*FxServicesManagerData
 	isDirty                    map[string]bool
-	messageRouter              *messageRouter.MessageRouter
+	messageRouter              messageRouter.IMessageRouter
 	onConnectionListChange     func(connectionList []internal.IdAndName)
 	onConnectionInstanceChange func(data internal.SendActionsForService)
 	fxManagerService           service.IFxManagerService
@@ -163,7 +163,7 @@ func (self *fxServiceManagerSlideData) handleFxServiceAdded(message *service.FxS
 	return nil
 }
 
-func NewData(
+func newData(
 	fxManagerService service.IFxManagerService,
 ) (*fxServiceManagerSlideData, error) {
 	result := &fxServiceManagerSlideData{

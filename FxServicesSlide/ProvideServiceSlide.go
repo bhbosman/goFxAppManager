@@ -23,7 +23,7 @@ func ProvideServiceSlide() fx.Option {
 					},
 				) (func() (internal.IFxManagerData, error), error) {
 					return func() (internal.IFxManagerData, error) {
-						return NewData(params.FxManagerService)
+						return newData(params.FxManagerService)
 					}, nil
 				},
 			},

@@ -33,7 +33,7 @@ type data struct {
 	pubSub                  *pubsub.PubSub
 	fxCreateAppsCallbackMap map[string]*FxApplicationInformation
 	fxAppsMap               map[string]messages.IApp
-	messageRouter           *messageRouter.MessageRouter
+	messageRouter           messageRouter.IMessageRouter
 	logger                  *zap.Logger
 }
 
@@ -50,11 +50,11 @@ func (self *data) GetState() (started []string, err error) {
 	return result, nil
 }
 
-func (self *data) SaveToConfiguration(ctx context.Context) error {
+func (self *data) SaveToConfiguration() error {
 	return nil
 }
 
-func (self *data) StartFromConfiguration(ctx context.Context) error {
+func (self *data) StartFromConfiguration() error {
 	return nil
 }
 
@@ -241,7 +241,7 @@ func newData(
 		messageRouter:           messageRouter.NewMessageRouter(),
 		logger:                  logger,
 	}
-	result.messageRouter.Add(result.handleEmptyQueue)
+	_ = result.messageRouter.Add(result.handleEmptyQueue)
 	var err error
 	for _, app := range FnApps {
 		err = multierr.Append(
