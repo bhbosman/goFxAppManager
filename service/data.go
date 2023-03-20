@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"github.com/bhbosman/goConn"
 	"github.com/bhbosman/gocommon/messageRouter"
 	"github.com/bhbosman/gocommon/messages"
 	"github.com/cskr/pubsub"
@@ -140,7 +141,7 @@ func (self *data) Start(startContext context.Context, name ...string) error {
 		var ok bool
 		var applicationInformation *FxApplicationInformation
 		var app messages.IApp
-		var cancelFunc context.CancelFunc
+		var cancelFunc goConn.ICancellationContext
 		self.logger.Info("Check if already started", zap.String("ServiceName", iterName))
 		if _, ok = self.fxAppsMap[iterName]; !ok {
 			self.logger.Info("Not started", zap.String("ServiceName", iterName))
@@ -149,7 +150,7 @@ func (self *data) Start(startContext context.Context, name ...string) error {
 				app, cancelFunc, err = applicationInformation.Callback()
 				onError := func() {
 					if cancelFunc != nil {
-						cancelFunc()
+						cancelFunc.CancelFunc()
 					}
 				}
 

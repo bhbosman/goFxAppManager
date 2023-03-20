@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/bhbosman/goCommsDefinitions v0.0.0-20230308211643-24fe88b2378e
+	github.com/bhbosman/goConn v0.0.0-00010101000000-000000000000
 	github.com/bhbosman/goUi v0.0.0-20230302065227-24c3cb06165e
 	github.com/bhbosman/gocommon v0.0.0-20230303055326-d59d6b655a59
 	github.com/cskr/pubsub v1.0.2
@@ -11,8 +12,8 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/rivo/tview v0.0.0-20220610163003-691f46d6f500
 	go.uber.org/fx v1.19.2
-	go.uber.org/multierr v1.6.0
-	go.uber.org/zap v1.23.0
+	go.uber.org/multierr v1.10.0
+	go.uber.org/zap v1.24.0
 )
 
 require (
@@ -47,3 +48,5 @@ replace github.com/bhbosman/gocommon => ../gocommon
 replace github.com/bhbosman/goCommsDefinitions => ../goCommsDefinitions
 
 replace github.com/cskr/pubsub => github.com/bhbosman/pubsub v1.0.3-0.20220802200819-029949e8a8af
+
+replace github.com/bhbosman/goConn => ../goConn
