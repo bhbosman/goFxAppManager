@@ -6,7 +6,7 @@ require (
 	github.com/bhbosman/goCommsDefinitions v0.0.0-20230308211643-24fe88b2378e
 	github.com/bhbosman/goConn v0.0.0-20230327111455-7a39299fb0aa
 	github.com/bhbosman/goUi v0.0.0-20230328181044-49e31970d158
-	github.com/bhbosman/gocommon v0.0.0-20230328150634-566a0f916878
+	github.com/bhbosman/gocommon v0.0.0-20230328205958-d21444a729d1
 	github.com/cskr/pubsub v1.0.2
 	github.com/gdamore/tcell/v2 v2.5.1
 	github.com/golang/mock v1.6.0
