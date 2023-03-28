@@ -50,7 +50,6 @@ replace github.com/cskr/pubsub => github.com/bhbosman/pubsub v1.0.3-0.2022080220
 replace github.com/rivo/tview => github.com/bhbosman/tview v0.0.0-20230310100135-f8b257a85d36
 
 
-replace github.com/golang/mock => ../gomock
 
 //replace github.com/bhbosman/goUi => ../goUi
 
