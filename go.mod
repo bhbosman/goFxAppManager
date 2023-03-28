@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/bhbosman/goCommsDefinitions v0.0.0-20230308211643-24fe88b2378e
-	github.com/bhbosman/goConn v0.0.0-00010101000000-000000000000
+	github.com/bhbosman/goConn v0.0.0-20230327111455-7a39299fb0aa
 	github.com/bhbosman/goUi v0.0.0-20230302065227-24c3cb06165e
 	github.com/bhbosman/gocommon v0.0.0-20230328150634-566a0f916878
 	github.com/cskr/pubsub v1.0.2
