@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"github.com/bhbosman/goConn"
+	"github.com/bhbosman/gocommon"
 	"github.com/bhbosman/gocommon/services/IDataShutDown"
 	"github.com/bhbosman/gocommon/services/IFxService"
 	"github.com/bhbosman/gocommon/services/ISendMessage"
@@ -12,7 +12,7 @@ import (
 
 type IFxManager interface {
 	ISendMessage.ISendMessage
-	Add(name string, callback goConn.CreateAppCallbackFn) error
+	Add(name string, callback gocommon.CreateAppCallbackFn) error
 	StopAll(ctx context.Context) error
 	StartAll(ctx context.Context) error
 	Stop(ctx context.Context, name ...string) error

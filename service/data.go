@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"github.com/bhbosman/goConn"
+	"github.com/bhbosman/gocommon"
 	"github.com/bhbosman/gocommon/messageRouter"
 	"github.com/bhbosman/gocommon/messages"
 	"github.com/cskr/pubsub"
@@ -13,13 +13,13 @@ import (
 
 type FxApplicationInformation struct {
 	Name     string
-	Callback goConn.CreateAppCallbackFn
+	Callback gocommon.CreateAppCallbackFn
 	isDirty  bool
 }
 
 func NewFxApplicationInformation(
 	name string,
-	callback goConn.CreateAppCallbackFn,
+	callback gocommon.CreateAppCallbackFn,
 ) *FxApplicationInformation {
 	return &FxApplicationInformation{
 		isDirty:  true,
@@ -33,7 +33,7 @@ type data struct {
 	appContext              context.Context
 	pubSub                  *pubsub.PubSub
 	fxCreateAppsCallbackMap map[string]*FxApplicationInformation
-	fxAppsMap               map[string]goConn.IApp
+	fxAppsMap               map[string]gocommon.IApp
 	messageRouter           messageRouter.IMessageRouter
 	logger                  *zap.Logger
 }
@@ -61,7 +61,7 @@ func (self *data) StartFromConfiguration() error {
 
 func (self *data) Add(
 	name string,
-	callback goConn.CreateAppCallbackFn,
+	callback gocommon.CreateAppCallbackFn,
 ) error {
 	self.fxCreateAppsCallbackMap[name] = NewFxApplicationInformation(
 		name,
@@ -104,7 +104,7 @@ func (self *data) Stop(stopContext context.Context, name ...string) error {
 	var err error
 	for _, iterName := range name {
 		var ok bool
-		var app goConn.IApp
+		var app gocommon.IApp
 		if app, ok = self.fxAppsMap[iterName]; ok {
 			if app == nil {
 				continue
@@ -140,8 +140,8 @@ func (self *data) Start(startContext context.Context, name ...string) error {
 
 		var ok bool
 		var applicationInformation *FxApplicationInformation
-		var app goConn.IApp
-		var cancelFunc goConn.ICancellationContext
+		var app gocommon.IApp
+		var cancelFunc gocommon.ICancellationContext
 		self.logger.Info("Check if already started", zap.String("ServiceName", iterName))
 		if _, ok = self.fxAppsMap[iterName]; !ok {
 			self.logger.Info("Not started", zap.String("ServiceName", iterName))
@@ -231,14 +231,14 @@ func (self *data) handleEmptyQueue(message *messages.EmptyQueue) interface{} {
 
 func newData(
 	applicationContext context.Context,
-	FnApps []goConn.CreateAppCallback,
+	FnApps []gocommon.CreateAppCallback,
 	pubSub *pubsub.PubSub,
 	logger *zap.Logger) (*data, error) {
 	result := &data{
 		appContext:              applicationContext,
 		pubSub:                  pubSub,
 		fxCreateAppsCallbackMap: make(map[string]*FxApplicationInformation),
-		fxAppsMap:               make(map[string]goConn.IApp),
+		fxAppsMap:               make(map[string]gocommon.IApp),
 		messageRouter:           messageRouter.NewMessageRouter(),
 		logger:                  logger,
 	}

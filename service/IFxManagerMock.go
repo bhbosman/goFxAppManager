@@ -6,7 +6,7 @@ package service
 
 import (
 	context "context"
-	"github.com/bhbosman/goConn"
+	"github.com/bhbosman/gocommon"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -36,7 +36,7 @@ func (m *MockIFxManager) EXPECT() *MockIFxManagerMockRecorder {
 }
 
 // Add mocks base method.
-func (m *MockIFxManager) Add(arg0 string, arg1 func() (goConn.IApp, context.CancelFunc, error)) error {
+func (m *MockIFxManager) Add(arg0 string, arg1 func() (gocommon.IApp, context.CancelFunc, error)) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Add", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -171,7 +171,7 @@ func (mr *MockIFxManagerMockRecorder) StopAll(arg0 interface{}) *gomock.Call {
 // 1
 func (mr *MockIFxManagerMockRecorder) OnAddDoAndReturn(
 	arg0, arg1 interface{},
-	f func(arg0 string, arg1 func() (goConn.IApp, context.CancelFunc, error)) error) *gomock.Call {
+	f func(arg0 string, arg1 func() (gocommon.IApp, context.CancelFunc, error)) error) *gomock.Call {
 	return mr.
 		Add(arg0, arg1).
 		DoAndReturn(f)
@@ -180,7 +180,7 @@ func (mr *MockIFxManagerMockRecorder) OnAddDoAndReturn(
 // 1
 func (mr *MockIFxManagerMockRecorder) OnAddDo(
 	arg0, arg1 interface{},
-	f func(arg0 string, arg1 func() (goConn.IApp, context.CancelFunc, error))) *gomock.Call {
+	f func(arg0 string, arg1 func() (gocommon.IApp, context.CancelFunc, error))) *gomock.Call {
 	return mr.
 		Add(arg0, arg1).
 		Do(f)
@@ -188,7 +188,7 @@ func (mr *MockIFxManagerMockRecorder) OnAddDo(
 
 // 1
 func (mr *MockIFxManagerMockRecorder) OnAddDoAndReturnDefault(
-	f func(arg0 string, arg1 func() (goConn.IApp, context.CancelFunc, error)) error) *gomock.Call {
+	f func(arg0 string, arg1 func() (gocommon.IApp, context.CancelFunc, error)) error) *gomock.Call {
 	return mr.
 		Add(gomock.Any(), gomock.Any()).
 		DoAndReturn(f)
@@ -196,7 +196,7 @@ func (mr *MockIFxManagerMockRecorder) OnAddDoAndReturnDefault(
 
 // 1
 func (mr *MockIFxManagerMockRecorder) OnAddDoDefault(
-	f func(arg0 string, arg1 func() (goConn.IApp, context.CancelFunc, error))) *gomock.Call {
+	f func(arg0 string, arg1 func() (gocommon.IApp, context.CancelFunc, error))) *gomock.Call {
 	return mr.
 		Add(gomock.Any(), gomock.Any()).
 		Do(f)

@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"github.com/bhbosman/goCommsDefinitions"
-	"github.com/bhbosman/goConn"
+	"github.com/bhbosman/gocommon"
 	"github.com/bhbosman/gocommon/ChannelHandler"
 	"github.com/bhbosman/gocommon/GoFunctionCounter"
 	"github.com/bhbosman/gocommon/services/IFxService"
@@ -40,7 +40,7 @@ func (self *service) GetState() (started []string, err error) {
 	return state.Args0, state.Args1
 }
 
-func (self *service) Add(name string, callback goConn.CreateAppCallbackFn) error {
+func (self *service) Add(name string, callback gocommon.CreateAppCallbackFn) error {
 	add, err := CallIFxManagerAdd(self.context, self.cmdChannel, true, name, callback)
 	if err != nil {
 		return err

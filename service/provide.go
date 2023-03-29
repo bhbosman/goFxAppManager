@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"github.com/bhbosman/goConn"
+	"github.com/bhbosman/gocommon"
 	"github.com/bhbosman/gocommon/GoFunctionCounter"
 	"github.com/cskr/pubsub"
 	"go.uber.org/fx"
@@ -136,9 +136,9 @@ func ProvideFxManager() fx.Option {
 				Target: func(
 					params struct {
 						fx.In
-						ApplicationName string                     `name:"ApplicationName"`
-						PubSub          *pubsub.PubSub             `name:"Application"`
-						FnApps          []goConn.CreateAppCallback `group:"Apps"`
+						ApplicationName string                       `name:"ApplicationName"`
+						PubSub          *pubsub.PubSub               `name:"Application"`
+						FnApps          []gocommon.CreateAppCallback `group:"Apps"`
 						Logger          *zap.Logger
 					},
 				) OnDataCallback {
