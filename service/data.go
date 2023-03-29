@@ -13,13 +13,13 @@ import (
 
 type FxApplicationInformation struct {
 	Name     string
-	Callback messages.CreateAppCallbackFn
+	Callback goConn.CreateAppCallbackFn
 	isDirty  bool
 }
 
 func NewFxApplicationInformation(
 	name string,
-	callback messages.CreateAppCallbackFn,
+	callback goConn.CreateAppCallbackFn,
 ) *FxApplicationInformation {
 	return &FxApplicationInformation{
 		isDirty:  true,
@@ -33,7 +33,7 @@ type data struct {
 	appContext              context.Context
 	pubSub                  *pubsub.PubSub
 	fxCreateAppsCallbackMap map[string]*FxApplicationInformation
-	fxAppsMap               map[string]messages.IApp
+	fxAppsMap               map[string]goConn.IApp
 	messageRouter           messageRouter.IMessageRouter
 	logger                  *zap.Logger
 }
@@ -61,7 +61,7 @@ func (self *data) StartFromConfiguration() error {
 
 func (self *data) Add(
 	name string,
-	callback messages.CreateAppCallbackFn,
+	callback goConn.CreateAppCallbackFn,
 ) error {
 	self.fxCreateAppsCallbackMap[name] = NewFxApplicationInformation(
 		name,
@@ -104,7 +104,7 @@ func (self *data) Stop(stopContext context.Context, name ...string) error {
 	var err error
 	for _, iterName := range name {
 		var ok bool
-		var app messages.IApp
+		var app goConn.IApp
 		if app, ok = self.fxAppsMap[iterName]; ok {
 			if app == nil {
 				continue
@@ -140,7 +140,7 @@ func (self *data) Start(startContext context.Context, name ...string) error {
 
 		var ok bool
 		var applicationInformation *FxApplicationInformation
-		var app messages.IApp
+		var app goConn.IApp
 		var cancelFunc goConn.ICancellationContext
 		self.logger.Info("Check if already started", zap.String("ServiceName", iterName))
 		if _, ok = self.fxAppsMap[iterName]; !ok {
@@ -231,14 +231,14 @@ func (self *data) handleEmptyQueue(message *messages.EmptyQueue) interface{} {
 
 func newData(
 	applicationContext context.Context,
-	FnApps []messages.CreateAppCallback,
+	FnApps []goConn.CreateAppCallback,
 	pubSub *pubsub.PubSub,
 	logger *zap.Logger) (*data, error) {
 	result := &data{
 		appContext:              applicationContext,
 		pubSub:                  pubSub,
 		fxCreateAppsCallbackMap: make(map[string]*FxApplicationInformation),
-		fxAppsMap:               make(map[string]messages.IApp),
+		fxAppsMap:               make(map[string]goConn.IApp),
 		messageRouter:           messageRouter.NewMessageRouter(),
 		logger:                  logger,
 	}

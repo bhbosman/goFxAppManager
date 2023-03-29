@@ -10,7 +10,6 @@ import (
 	"github.com/bhbosman/goConn"
 
 	errors "github.com/bhbosman/gocommon/errors"
-	messages "github.com/bhbosman/gocommon/messages"
 )
 
 // Interface A Comment
@@ -19,7 +18,7 @@ import (
 // Interface IFxManager, Method: Add
 type IFxManagerAddIn struct {
 	arg0 string
-	arg1 func() (messages.IApp, goConn.ICancellationContext, error)
+	arg1 func() (goConn.IApp, goConn.ICancellationContext, error)
 }
 
 type IFxManagerAddOut struct {
@@ -40,7 +39,7 @@ type IFxManagerAdd struct {
 	outDataChannel chan IFxManagerAddOut
 }
 
-func NewIFxManagerAdd(waitToComplete bool, arg0 string, arg1 func() (messages.IApp, goConn.ICancellationContext, error)) *IFxManagerAdd {
+func NewIFxManagerAdd(waitToComplete bool, arg0 string, arg1 func() (goConn.IApp, goConn.ICancellationContext, error)) *IFxManagerAdd {
 	var outDataChannel chan IFxManagerAddOut
 	if waitToComplete {
 		outDataChannel = make(chan IFxManagerAddOut)
@@ -78,7 +77,7 @@ func (self *IFxManagerAdd) Close() error {
 	close(self.outDataChannel)
 	return nil
 }
-func CallIFxManagerAdd(context context.Context, channel chan<- interface{}, waitToComplete bool, arg0 string, arg1 func() (messages.IApp, goConn.ICancellationContext, error)) (IFxManagerAddOut, error) {
+func CallIFxManagerAdd(context context.Context, channel chan<- interface{}, waitToComplete bool, arg0 string, arg1 func() (goConn.IApp, goConn.ICancellationContext, error)) (IFxManagerAddOut, error) {
 	if context != nil && context.Err() != nil {
 		return IFxManagerAddOut{}, context.Err()
 	}

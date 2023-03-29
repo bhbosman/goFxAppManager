@@ -3,9 +3,9 @@ package service
 import (
 	"context"
 	"github.com/bhbosman/goCommsDefinitions"
+	"github.com/bhbosman/goConn"
 	"github.com/bhbosman/gocommon/ChannelHandler"
 	"github.com/bhbosman/gocommon/GoFunctionCounter"
-	"github.com/bhbosman/gocommon/messages"
 	"github.com/bhbosman/gocommon/services/IFxService"
 	"github.com/bhbosman/gocommon/services/ISendMessage"
 	"go.uber.org/multierr"
@@ -40,7 +40,7 @@ func (self *service) GetState() (started []string, err error) {
 	return state.Args0, state.Args1
 }
 
-func (self *service) Add(name string, callback messages.CreateAppCallbackFn) error {
+func (self *service) Add(name string, callback goConn.CreateAppCallbackFn) error {
 	add, err := CallIFxManagerAdd(self.context, self.cmdChannel, true, name, callback)
 	if err != nil {
 		return err
