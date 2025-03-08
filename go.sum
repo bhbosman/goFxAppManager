@@ -27,6 +27,8 @@ github.com/bhbosman/goUi v0.0.0-20250308124821-836921ea8a1e h1:QVfBl4jjU1X/DtmHN
 github.com/bhbosman/goUi v0.0.0-20250308124821-836921ea8a1e/go.mod h1:l6UDCyN+is/QLuGMx3hjrQhOFXyH4q30vhPXWFRDX2A=
 github.com/bhbosman/goUi v0.0.0-20250308132651-2a5e82ef72b0 h1:3ordy/bAGZcIlTsoYX91wdC9ToTKIyC+Bexyn7l1/Co=
 github.com/bhbosman/goUi v0.0.0-20250308132651-2a5e82ef72b0/go.mod h1:7oMy2ehnSEUqADTLjWJa+q1Coolp3MEL3yquKabG1Qg=
+github.com/bhbosman/goUi v0.0.0-20250308145459-134c11444111 h1:zLUCgoIU9kpolN127wL6Tt0c9hiiwCMv+bkctXsVzFw=
+github.com/bhbosman/goUi v0.0.0-20250308145459-134c11444111/go.mod h1:Sb+lHPb2x1Xv1SZR67dKpkb9LU15OQwfVPtv+CCPCVw=
 github.com/bhbosman/gocommon v0.0.0-20230329101749-40db0f52d859 h1:NCx+ApHbdXn9tlhzywGejvmPSDj7v8FlDwxlU84G4sc=
 github.com/bhbosman/gocommon v0.0.0-20230329101749-40db0f52d859/go.mod h1:Om88rcHnwFIos6FEr5346bZM8/7ex5gFZ4/VeX+XoJs=
 github.com/bhbosman/gocommon v0.0.0-20230507180205-b30f653fb84c h1:Gak0cmo63hRuZw3nA9UTbJLu4YUT5zEsYJsI0LCEeKE=
