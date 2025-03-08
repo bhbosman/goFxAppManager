@@ -7,7 +7,7 @@ toolchain go1.24.0
 require (
 	github.com/bhbosman/goCommsDefinitions v0.0.0-20250307125227-bfc368fdddf9
 	github.com/bhbosman/goUi v0.0.0-20250307150712-d06325af4877
-	github.com/bhbosman/gocommon v0.0.0-20230507180205-b30f653fb84c
+	github.com/bhbosman/gocommon v0.0.0-20250307235859-f370cb0a3bac
 	github.com/cskr/pubsub v1.0.2
 	github.com/gdamore/tcell/v2 v2.8.1
 	github.com/golang/mock v1.6.0
@@ -18,7 +18,7 @@ require (
 )
 
 require (
-	github.com/bhbosman/goerrors v0.0.0-20220623084908-4d7bbcd178cf // indirect
+	github.com/bhbosman/goerrors v0.0.0-20250307194237-312d070c8e38 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
